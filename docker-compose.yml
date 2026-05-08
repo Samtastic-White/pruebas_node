@@ -1,0 +1,53 @@
+services:
+  backend_seed:
+    container_name: marathon_backend
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    env_file:
+      - ./src/.env
+    ports:
+      - 4012:4000
+    volumes:
+      - ./src/src:/app/src
+    depends_on:
+      - postgres_seed
+      - mongo_seed
+    networks:
+      - marathon_network
+
+  postgres_seed:
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile.local
+    container_name: postgres_seed
+    restart: unless-stopped
+    env_file:
+      - src/.env
+    volumes:
+      - ./postgres/dbdata:/var/lib/postgresql
+    ports:
+      - 5433:5432
+    shm_size: 256mb
+    networks:
+      - marathon_network
+
+  mongo_seed:
+    image: mongo:8.2.6
+    container_name: mongo_seed
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: marathon_logs
+    volumes:
+      - ./mongo/dbdata:/data/db
+    ports:
+      - 27019:27017
+    networks:
+      - marathon_network
+
+networks:
+  marathon_network:
+    driver: bridge

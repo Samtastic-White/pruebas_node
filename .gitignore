@@ -1,0 +1,6 @@
+dbdata
+.DS_Store
+observability
+.env
+ngrok
+mongo_data
