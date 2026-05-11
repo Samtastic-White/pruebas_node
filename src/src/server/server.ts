@@ -2,7 +2,7 @@ import compression from 'compression'
 import cors from 'cors'
 import express, { type Router } from 'express'
 import { connectMongo } from '../infrastructure/database/mongo/connection'
-
+import { seedAdmin } from '../infrastructure/database/postgres/seeds/admin.seed'
 
 export class Server {
   public readonly app = express()
@@ -29,6 +29,7 @@ export class Server {
   public async start(): Promise<void> {
     this.middlewares()
     await connectMongo()
+    await seedAdmin()
     this.app.listen(this.port, () => {
       console.log(` Servidor en http://localhost:${this.port}`)
     })

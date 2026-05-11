@@ -1,0 +1,147 @@
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Plus, Search } from 'lucide-react'
+import { useRegistrations } from '../hooks/useRegistrations'
+import { useEvents } from '../../events/hooks/useEvents'
+import RegistrationForm from '../components/RegistrationForm'
+import { useDebounce } from '../../../shared/hooks/useDebounce'
+import api from '../../../config/api'
+import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
+
+export default function RegistrationsPage() {
+  const { data: registrations, isLoading } = useRegistrations()
+  const { data: events } = useEvents()
+  const [showForm, setShowForm] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const debouncedSearch = useDebounce(search, 500)
+  const queryClient = useQueryClient()
+
+  const activeEvents = events?.filter(e => e.status === 'active') || []
+
+  const handleCreate = async (data: any) => {
+    setLoading(true)
+    try {
+      await api.post('/registrations', data)
+      toast.success('Corredor inscrito exitosamente')
+      queryClient.invalidateQueries({ queryKey: ['registrations'] })
+      setShowForm(false)
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Error al inscribir')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filtered = registrations?.filter(r => {
+    const fullName = r.full_name || ''
+    const dni = r.dni || ''
+    const eventName = r.event_name || ''
+    const searchLower = debouncedSearch.toLowerCase()
+
+    const matchSearch =
+      fullName.toLowerCase().includes(searchLower) ||
+      dni.includes(debouncedSearch) ||
+      eventName.toLowerCase().includes(searchLower)
+
+    const eventStatus = events?.find(e => e.id === r.event_id)?.status
+    const matchStatus = statusFilter === 'all' || eventStatus === statusFilter
+
+    return matchSearch && matchStatus
+  })
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-[#f97316] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-[#e2e8f0]">Inscripciones</h1>
+          <p className="text-[#94a3b8] text-sm mt-1">Gestiona los corredores inscritos</p>
+        </div>
+        <button
+          onClick={() => setShowForm(true)}
+          className="flex items-center gap-2 bg-[#f97316] hover:bg-[#ea6a0a] text-white px-4 py-2.5 rounded-lg font-medium transition-colors"
+        >
+          <Plus size={18} /> Inscribir Corredor
+        </button>
+      </div>
+
+      <div className="flex gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" size={18} />
+          <input
+            type="text"
+            placeholder="Buscar por corredor, DNI o evento..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full bg-[#171923] border border-white/5 rounded-lg py-2.5 pl-10 pr-4 text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
+          />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={e => setStatusFilter(e.target.value)}
+          className="bg-[#171923] border border-white/5 rounded-lg py-2.5 px-4 text-[#e2e8f0] focus:border-[#f97316] focus:outline-none w-44"
+        >
+          <option value="all">Todos los estados</option>
+          <option value="active">Activos</option>
+          <option value="inactive">Inactivos</option>
+          <option value="finished">Finalizados</option>
+        </select>
+      </div>
+
+      <div className="bg-[#171923] border border-white/5 rounded-xl overflow-hidden">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="border-b border-white/5">
+              <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Corredor</th>
+              <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">DNI</th>
+              <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Email</th>
+              <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Evento</th>
+              <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered?.map((r) => (
+              <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                <td className="py-3 px-4 text-[#e2e8f0] font-medium">{r.full_name}</td>
+                <td className="py-3 px-4 text-[#94a3b8] text-sm">{r.dni}</td>
+                <td className="py-3 px-4 text-[#94a3b8] text-sm">{r.email}</td>
+                <td className="py-3 px-4 text-[#94a3b8] text-sm">{r.event_name}</td>
+                <td className="py-3 px-4 text-[#94a3b8] text-sm">
+                  {r.created_at ? new Date(r.created_at).toLocaleDateString('es-CO') : '-'}
+                </td>
+              </tr>
+            ))}
+            {filtered?.length === 0 && (
+              <tr>
+                <td colSpan={5} className="py-12 text-center text-[#94a3b8]">
+                  {search || statusFilter !== 'all'
+                    ? 'No se encontraron inscripciones con esos filtros'
+                    : 'No hay inscripciones registradas'}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {showForm && (
+        <RegistrationForm
+          events={activeEvents}
+          onClose={() => setShowForm(false)}
+          onSubmit={handleCreate}
+          loading={loading}
+        />
+      )}
+    </motion.div>
+  )
+}

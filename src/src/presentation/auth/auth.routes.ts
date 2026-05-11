@@ -1,8 +1,9 @@
 import { Router } from 'express'
-import { login } from './auth.controller'
+import { login, changePassword } from './auth.controller'
 
 const authRoutes = Router()
 
 authRoutes.post('/login', login)
+authRoutes.put('/change-password', changePassword)
 
 export { authRoutes }

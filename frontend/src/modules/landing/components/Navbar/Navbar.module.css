@@ -1,0 +1,31 @@
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 3rem;
+  transition: background 0.3s ease, padding 0.3s ease;
+}
+
+.nav.scrolled {
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(12px);
+  padding: 0.8rem 3rem;
+  border-bottom: 1px solid rgba(249, 115, 22, 0.15);
+}
+
+.logo {
+  cursor: pointer;
+}
+
+.logoRun {
+  font-family: 'Barlow Condensed', 'Oswald', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #f97316;
+  letter-spacing: 0.02em;
+}

@@ -4,3 +4,4 @@ observability
 .env
 ngrok
 mongo_data
+node_modules
