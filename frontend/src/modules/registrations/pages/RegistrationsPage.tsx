@@ -123,7 +123,7 @@ export default function RegistrationsPage() {
             ))}
             {filtered?.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-12 text-center text-[#94a3b8]">
+                <td colSpan={6} className="py-12 text-center text-[#94a3b8]">
                   {search || statusFilter !== 'all'
                     ? 'No se encontraron inscripciones con esos filtros'
                     : 'No hay inscripciones registradas'}

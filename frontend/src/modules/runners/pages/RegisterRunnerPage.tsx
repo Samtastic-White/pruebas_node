@@ -36,7 +36,7 @@ export default function RegisterRunnerPage() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-lg">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-lg mx-auto mt-20">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-[#e2e8f0]">Inscribir Corredor</h1>
         <p className="text-[#94a3b8] text-sm mt-1">Registra un corredor en un evento activo</p>

@@ -4,7 +4,7 @@ export const registrationRepository = {
   findAll: () => db('registrations')
     .join('events', 'registrations.event_id', 'events.id')
     .join('runners', 'registrations.runner_id', 'runners.id')
-    .select('registrations.*', 'events.name as event_name', 'runners.full_name', 'runners.dni'),
+    .select('registrations.*', 'events.name as event_name', 'runners.full_name', 'runners.dni', 'runners.email'),
   
   findByEvent: (eventId: number) => db('registrations')
     .join('runners', 'registrations.runner_id', 'runners.id')

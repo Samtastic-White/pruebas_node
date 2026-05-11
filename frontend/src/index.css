@@ -23,3 +23,10 @@
 .card-border {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+  opacity: 0.8;
+}

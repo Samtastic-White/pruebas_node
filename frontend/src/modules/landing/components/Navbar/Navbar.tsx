@@ -18,7 +18,7 @@ export default function Navbar() {
         <span className={styles.logoRun}>MARATHON</span>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4">
         <a href="#eventos" className="text-white/70 hover:text-white text-sm font-medium transition-colors">
           Eventos
         </a>

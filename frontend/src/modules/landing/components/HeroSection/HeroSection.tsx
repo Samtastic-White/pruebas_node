@@ -29,7 +29,7 @@ export default function HeroSection({ evento, onInscribirse }: Props) {
 
   return (
     <section className={styles.hero}>
-      <div className={styles.bgImage} style={{ backgroundImage: `url(${evento.image_url || 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=1920&q=80'})` }} />
+      <div className={styles.bgImage} key={evento?.id} style={{ backgroundImage: `url(${evento.image_url || 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=1920&q=80'})` }} />
       <div className={styles.overlayGradient} />
       <div className={styles.overlayColor} />
 

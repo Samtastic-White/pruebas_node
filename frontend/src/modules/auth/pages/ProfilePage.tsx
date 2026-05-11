@@ -43,7 +43,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-md">
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-md mx-auto mt-20">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-[#e2e8f0]">Perfil</h1>
         <p className="text-[#94a3b8] text-sm mt-1">Cambia tu contraseña de administrador</p>

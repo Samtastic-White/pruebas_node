@@ -8,7 +8,7 @@ export const Sidebar = () => {
     { icon: CalendarDays, label: 'Eventos', path: '/events' },
     { icon: ClipboardList, label: 'Inscripciones', path: '/registrations' },
     { icon: Users, label: 'Corredores', path: '/runners' },
-    { icon: UserPlus, label: 'Inscribir corredor', path: '/register-runner' },
+    //{ icon: UserPlus, label: 'Inscribir corredor', path: '/register-runner' },
     { icon: UserCircle, label: 'Perfil', path: '/profile' },
   ]
 
