@@ -2,6 +2,7 @@ import { runnerRepository } from '../../infrastructure/database/postgres/reposit
 import { registrationRepository } from '../../infrastructure/database/postgres/repositories/registration.repository'
 import { eventRepository } from '../../infrastructure/database/postgres/repositories/event.repository'
 import { logSuccess, logError } from '../../infrastructure/database/mongo/services/logservice'
+import { db } from '../../infrastructure/database'
 
 const log = async (type: 'success' | 'error', accion: string, mensajeODetalles?: string | object) => {
   if (type === 'success') {
@@ -72,4 +73,24 @@ export const registrationService = {
       throw error
     }
   },
+
+  cancel: async (id: number) => {
+    try {
+      const registration = await db('registrations').where({ id }).first()
+      
+      if (!registration) {
+        await log('error', 'REGISTRATION_NOT_FOUND', `Inscripción ${id} no encontrada`)
+        return null
+      }
+      
+      await db('registrations').where({ id }).update({ status: 'cancelled' })
+      
+      await log('success', 'REGISTRATION_CANCELLED', { registration_id: id })
+      return { success: true }
+      
+    } catch (error: any) {
+      await log('error', 'CANCEL_REGISTRATION_ERROR', error.message)
+      throw error
+    }
+  }
 }

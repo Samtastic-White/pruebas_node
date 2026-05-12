@@ -3,6 +3,7 @@ import cors from 'cors'
 import express, { type Router } from 'express'
 import { connectMongo } from '../infrastructure/database/mongo/connection'
 import { seedAdmin } from '../infrastructure/database/postgres/seeds/admin.seed'
+import { eventService } from '../application/events/event.service'
 
 export class Server {
   public readonly app = express()
@@ -30,8 +31,14 @@ export class Server {
     this.middlewares()
     await connectMongo()
     await seedAdmin()
+    await eventService.updateExpiredEvents()
+    
+    setInterval(() => {
+      eventService.updateExpiredEvents()
+    }, 30 * 60 * 1000)
+    
     this.app.listen(this.port, () => {
-      console.log(` Servidor en http://localhost:${this.port}`)
+      console.log(`🚀 Servidor en http://localhost:${this.port}`)
     })
   }
 }

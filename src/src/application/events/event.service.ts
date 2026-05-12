@@ -1,5 +1,6 @@
 import { eventRepository } from '../../infrastructure/database/postgres/repositories/event.repository'
 import { logSuccess, logError } from '../../infrastructure/database/mongo/services/logservice'
+import  db  from '../../infrastructure/database/postgres/connection'
 
 const log = async (
   type: 'success' | 'error',
@@ -88,6 +89,14 @@ export const eventService = {
     } catch (error: any) {
       await log('error', 'DELETE_EVENT_ERROR', error.message)
       throw error
+    }
+  },
+
+  updateExpiredEvents: async () => {
+    const today = new Date().toISOString().split('T')[0]
+    const updated = await eventRepository.updateExpired(today)
+    if (updated > 0) {
+      console.log(` ${updated} marcado como finalizado`)
     }
   },
 }

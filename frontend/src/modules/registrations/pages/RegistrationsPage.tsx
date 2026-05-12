@@ -7,7 +7,7 @@ import RegistrationForm from '../components/RegistrationForm'
 import { useDebounce } from '../../../shared/hooks/useDebounce'
 import api from '../../../config/api'
 import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function RegistrationsPage() {
   const { data: registrations, isLoading } = useRegistrations()
@@ -34,6 +34,15 @@ export default function RegistrationsPage() {
       setLoading(false)
     }
   }
+
+  const cancelMutation = useMutation({
+    mutationFn: (id: number) => api.put(`/registrations/${id}/cancel`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['registrations'] })
+      toast.success('Inscripción cancelada')
+    },
+    onError: () => toast.error('Error al cancelar'),
+  })
 
   const filtered = registrations?.filter(r => {
     const fullName = r.full_name || ''
@@ -62,20 +71,21 @@ export default function RegistrationsPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-[#e2e8f0]">Inscripciones</h1>
-          <p className="text-[#94a3b8] text-sm mt-1">Gestiona los corredores inscritos</p>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#e2e8f0]">Inscripciones</h1>
+          <p className="text-[#94a3b8] text-xs sm:text-sm mt-1">Gestiona los corredores inscritos</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-[#f97316] hover:bg-[#ea6a0a] text-white px-4 py-2.5 rounded-lg font-medium transition-colors"
+          className="flex items-center gap-1 sm:gap-2 bg-[#f97316] hover:bg-[#ea6a0a] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
         >
-          <Plus size={18} /> Inscribir Corredor
+          <Plus size={16} /> <span className="hidden sm:inline">Inscribir Corredor</span>
         </button>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" size={18} />
           <input
@@ -83,13 +93,13 @@ export default function RegistrationsPage() {
             placeholder="Buscar por corredor, DNI o evento..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full bg-[#171923] border border-white/5 rounded-lg py-2.5 pl-10 pr-4 text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
+            className="w-full bg-[#171923] border border-white/5 rounded-lg py-2.5 pl-10 pr-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
           />
         </div>
         <select
           value={statusFilter}
           onChange={e => setStatusFilter(e.target.value)}
-          className="bg-[#171923] border border-white/5 rounded-lg py-2.5 px-4 text-[#e2e8f0] focus:border-[#f97316] focus:outline-none w-44"
+          className="bg-[#171923] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] focus:border-[#f97316] focus:outline-none w-full sm:w-44"
         >
           <option value="all">Todos los estados</option>
           <option value="active">Activos</option>
@@ -98,8 +108,8 @@ export default function RegistrationsPage() {
         </select>
       </div>
 
-      <div className="bg-[#171923] border border-white/5 rounded-xl overflow-hidden">
-        <table className="w-full text-left">
+      <div className="bg-[#171923] border border-white/5 rounded-xl overflow-x-auto">
+        <table className="w-full text-left min-w-[700px]">
           <thead>
             <tr className="border-b border-white/5">
               <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Corredor</th>
@@ -107,17 +117,30 @@ export default function RegistrationsPage() {
               <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Email</th>
               <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Evento</th>
               <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Fecha</th>
+              <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {filtered?.map((r) => (
               <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                <td className="py-3 px-4 text-[#e2e8f0] font-medium">{r.full_name}</td>
+                <td className="py-3 px-4 text-[#e2e8f0] font-medium text-sm">{r.full_name}</td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">{r.dni}</td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">{r.email}</td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">{r.event_name}</td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">
                   {r.created_at ? new Date(r.created_at).toLocaleDateString('es-CO') : '-'}
+                </td>
+                <td className="py-3 px-4">
+                  <button
+                    onClick={() => {
+                      if (confirm('¿Cancelar esta inscripción?')) {
+                        cancelMutation.mutate(r.id)
+                      }
+                    }}
+                    className="text-[#ef4444] hover:bg-[#ef4444]/10 px-2 py-1 rounded text-xs font-medium transition-colors"
+                  >
+                    Cancelar
+                  </button>
                 </td>
               </tr>
             ))}

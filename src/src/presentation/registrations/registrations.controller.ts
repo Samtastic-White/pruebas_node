@@ -39,3 +39,15 @@ export const createRegistration = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al crear inscripción' })
   }
 }
+
+export const cancelRegistration = async (req: Request, res: Response) => {
+  try {
+    const result = await registrationService.cancel(Number(req.params.id))
+    
+    if (!result) return res.status(404).json({ error: 'Inscripción no encontrada' })
+    
+    res.json({ message: 'Inscripción cancelada' })
+  } catch (error: any) {
+    res.status(500).json({ error: 'Error al cancelar inscripción' })
+  }
+}

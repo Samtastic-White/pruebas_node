@@ -25,11 +25,11 @@ export default function RegistrationForm({ events, onClose, onSubmit, loading }:
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 lg:p-4 bg-black/60 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-[#171923] border border-white/5 rounded-xl w-full max-w-md p-6"
+        className="bg-[#171923] border border-white/5 rounded-none lg:rounded-xl w-full lg:max-w-md h-full lg:h-auto overflow-y-auto p-4 lg:p-6"
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-[#e2e8f0]">Inscribir Corredor</h2>

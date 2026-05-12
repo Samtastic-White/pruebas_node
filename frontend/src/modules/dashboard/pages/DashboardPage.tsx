@@ -57,7 +57,7 @@ export default function DashboardPage() {
         <p className="text-gray-400 mt-1">Resumen general de tus eventos</p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
           <motion.div
             key={stat.label}
