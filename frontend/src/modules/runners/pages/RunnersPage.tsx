@@ -128,19 +128,19 @@ export default function RunnersPage() {
                 <div>
                   <p className="text-[#94a3b8] text-xs">Registrado</p>
                   <p className="text-[#e2e8f0] font-medium">
-                    {new Date(runner.created_at).toLocaleDateString('es-CO')}
+                    {new Date(runner.created_at.split('T')[0] + 'T12:00:00').toLocaleDateString('es-CO')}
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#171923] border border-white/5 rounded-xl overflow-hidden">
+          <div className="bg-[#171923] border border-white/5 rounded-xl overflow-x-auto">
             <div className="p-4 border-b border-white/5 flex items-center gap-2">
               <History size={18} className="text-[#f97316]" />
               <h2 className="text-lg font-semibold text-[#e2e8f0]">Historial de Carreras</h2>
             </div>
-            <table className="w-full text-left">
+            <table className="w-full text-left min-w-[600px]">
               <thead>
                 <tr className="border-b border-white/5">
                   <th className="py-3 px-4 text-[#94a3b8] font-medium text-sm">Evento</th>
@@ -154,11 +154,11 @@ export default function RunnersPage() {
                   <tr key={i} className="border-b border-white/5">
                     <td className="py-3 px-4 text-[#e2e8f0]">{ins.name}</td>
                     <td className="py-3 px-4 text-[#94a3b8] text-sm">
-                      {new Date(ins.event_date).toLocaleDateString('es-CO')}
+                      {new Date(ins.event_date.split('T')[0] + 'T12:00:00').toLocaleDateString('es-CO')}
                     </td>
                     <td className="py-3 px-4">{statusBadge(ins.status)}</td>
                     <td className="py-3 px-4 text-[#94a3b8] text-sm">
-                      {new Date(ins.created_at).toLocaleDateString('es-CO')}
+                      {new Date(ins.created_at.split('T')[0] + 'T12:00:00').toLocaleDateString('es-CO')}
                     </td>
                   </tr>
                 ))}

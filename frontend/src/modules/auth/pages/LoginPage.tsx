@@ -90,7 +90,7 @@ export default function LoginPage() {
           </form>
 
           <p className="text-center text-[#94a3b8] text-xs mt-6">
-            Marathon Running Events © 2026
+            Todos los derechos reservados para mi © 2026
           </p>
         </div>
       </motion.div>

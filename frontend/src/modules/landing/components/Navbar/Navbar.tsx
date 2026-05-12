@@ -11,6 +11,7 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+  
 
   return (
     <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>

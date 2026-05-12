@@ -11,5 +11,5 @@ export enum RegistrationStatus {
 
 export enum AdminRole {
   ADMIN = 'admin',
-  SUPERADMIN = 'superadmin',
+  //SUPERADMIN = 'superadmin',
 }

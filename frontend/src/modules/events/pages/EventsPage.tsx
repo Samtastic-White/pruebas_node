@@ -108,7 +108,7 @@ export default function EventsPage() {
               <tr key={event.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                 <td className="py-3 px-4 text-[#e2e8f0] font-medium text-sm">{event.name}</td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">
-                  {new Date(event.event_date).toLocaleDateString('es-CO')}
+                  {new Date(event.event_date.split('T')[0] + 'T12:00:00').toLocaleDateString('es-CO')}
                 </td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">{event.distance}</td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">${event.price}</td>

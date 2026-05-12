@@ -8,8 +8,9 @@ interface Props {
 }
 
 export default function HeroSection({ evento, onInscribirse }: Props) {
-  const countdown = useCountdown(evento?.event_date || '')
-
+  const countdown = useCountdown(
+    evento ? (evento.event_date.split('T')[0] + 'T' + (evento.event_time || '00:00')) : '2099-01-01T00:00:00'
+  )
   const pad = (n: number) => String(n).padStart(2, '0')
 
   if (!evento) {
@@ -29,7 +30,7 @@ export default function HeroSection({ evento, onInscribirse }: Props) {
 
   return (
     <section className={styles.hero}>
-      <div className={styles.bgImage} key={evento?.id} style={{ backgroundImage: `url(${evento.image_url || 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=1920&q=80'})` }} />
+      <div className={styles.bgImage} key={evento.id} style={{ backgroundImage: `url(${evento.image_url || 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=1920&q=80'})` }} />
       <div className={styles.overlayGradient} />
       <div className={styles.overlayColor} />
 
@@ -56,31 +57,49 @@ export default function HeroSection({ evento, onInscribirse }: Props) {
           <span className={styles.metaItem}>{evento.distance}</span>
         </div>
 
-        <button className={styles.cta} onClick={onInscribirse}>
-          INSCRIBIRME AHORA
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
-            <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
-          </svg>
-        </button>
+        {evento.status !== 'finished' && (
+          <button className={styles.cta} onClick={onInscribirse}>
+            INSCRIBIRME AHORA
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18">
+              <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        )}
       </div>
 
       <div className={styles.bottomBar}>
-        <div className={styles.countdownBlock}>
-          <p className={styles.countdownLabel}>FALTAN PARA LA CARRERA</p>
-          <div className={styles.countdownGrid}>
-            {[
-              { val: countdown.dias, label: 'DÍAS' },
-              { val: countdown.horas, label: 'HORAS' },
-              { val: countdown.minutos, label: 'MIN' },
-              { val: countdown.segundos, label: 'SEG' },
-            ].map(({ val, label }) => (
-              <div key={label} className={styles.countdownUnit}>
-                <span className={styles.countdownNum}>{pad(val)}</span>
-                <span className={styles.countdownSub}>{label}</span>
-              </div>
-            ))}
+        {countdown.expired ? (
+          <div className={styles.countdownBlock}>
+            <p className={styles.countdownLabel}>EVENTO FINALIZADO</p>
+            <p className={styles.countdownNum} style={{ fontSize: '1.5rem', color: '#f97316' }}>
+              Gracias por participar
+            </p>
           </div>
-        </div>
+        ) : (
+          <div className={styles.countdownBlock}>
+            <p className={styles.countdownLabel}>
+              {countdown.dias === 0 && countdown.horas === 0 ? '¡ES HOY!' : 'FALTAN PARA LA CARRERA'}
+            </p>
+            <div className={styles.countdownGrid}>
+              <div className={styles.countdownUnit}>
+                <span className={styles.countdownNum}>{pad(countdown.dias)}</span>
+                <span className={styles.countdownSub}>DÍAS</span>
+              </div>
+              <div className={styles.countdownUnit}>
+                <span className={styles.countdownNum}>{pad(countdown.horas)}</span>
+                <span className={styles.countdownSub}>HORAS</span>
+              </div>
+              <div className={styles.countdownUnit}>
+                <span className={styles.countdownNum}>{pad(countdown.minutos)}</span>
+                <span className={styles.countdownSub}>MIN</span>
+              </div>
+              <div className={styles.countdownUnit}>
+                <span className={styles.countdownNum}>{pad(countdown.segundos)}</span>
+                <span className={styles.countdownSub}>SEG</span>
+              </div>
+            </div>
+          </div>
+        )}
         <div className={styles.statsRow}>
           <div className={styles.statItem}>
             <strong>${evento.price}</strong>

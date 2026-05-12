@@ -9,8 +9,9 @@ import type { Event } from '../types/event.types'
 export default function LandingPage() {
   const { data: events } = useEvents()
   const activeEvents = events
-    ?.filter(e => e.status === 'active')
-    .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()) || []
+    ?.filter(e => e.status === 'active' || e.status === 'finished')
+    .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()) || 
+  []
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(activeEvents[0] || null)
   const [showModal, setShowModal] = useState(false)
 
