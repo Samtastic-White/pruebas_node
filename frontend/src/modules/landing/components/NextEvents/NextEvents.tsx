@@ -8,7 +8,7 @@ interface Props {
   onSeleccionar: (evento: Event) => void
 }
 
-export default function NextEvents({ eventos, eventoActivoId, onSeleccionar }: Props) {
+export default function NextEvents({ eventos, onSeleccionar }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -28,8 +28,6 @@ export default function NextEvents({ eventos, eventoActivoId, onSeleccionar }: P
     const selectedEvent = eventos[currentIndex]
     onSeleccionar(selectedEvent)
 
-    //const card = scrollRef.current?.children[currentIndex] as HTMLElement
-    //card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
   }, [currentIndex])
 
   const scroll = (dir: 'left' | 'right') => {
@@ -58,7 +56,6 @@ export default function NextEvents({ eventos, eventoActivoId, onSeleccionar }: P
         </div>
       </div>
 
-      {/* Indicadores de dots */}
       <div className="flex justify-center gap-2 mb-4">
         {eventos.map((_, i) => (
           <button

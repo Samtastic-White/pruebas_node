@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Edit, Trash2 } from 'lucide-react'
+import { Plus, Edit, Trash2, Download } from 'lucide-react'
 import { useEvents, useCreateEvent, useUpdateEvent, useDeleteEvent } from '../hooks/useEvents'
 import EventForm from '../components/EventForm'
 import type { Event } from '../types/event.types'
 import { useDebounce } from '../../../shared/hooks/useDebounce'
+import { exportToExcel } from '../../../shared/utils/exportToExcel'
 
 export default function EventsPage() {
   const { data: events, isLoading } = useEvents()
@@ -48,6 +49,34 @@ export default function EventsPage() {
     )
   }
 
+  const handleExport = async () => {
+    const exportData = filteredEvents?.map(event => ({
+      nombre: event.name,
+      fecha: new Date(event.event_date.split('T')[0] + 'T12:00:00').toLocaleDateString('es-CO'),
+      hora: event.event_time?.slice(0, 5),
+      lugar: event.location,
+      distancia: event.distance,
+      precio: `$${event.price}`,
+      cupos: event.max_slots === 0 ? 'Ilimitado' : String(event.max_slots),
+      estado: event.status === 'active' ? 'Activo' : event.status === 'inactive' ? 'Inactivo' : 'Finalizado',
+    }))
+  
+    await exportToExcel(exportData || [], [
+      { header: 'Nombre', key: 'nombre', width: 30 },
+      { header: 'Fecha', key: 'fecha', width: 14 },
+      { header: 'Hora', key: 'hora', width: 8 },
+      { header: 'Lugar', key: 'lugar', width: 25 },
+      { header: 'Distancia', key: 'distancia', width: 12 },
+      { header: 'Precio', key: 'precio', width: 10 },
+      { header: 'Cupos', key: 'cupos', width: 10 },
+      { header: 'Estado', key: 'estado', width: 12 },
+    ], {
+      filename: `eventos-${new Date().toISOString().split('T')[0]}`,
+      templateKey: 'events',  // ← Solo la clave
+      dataStartRow: 5,
+    })
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -63,12 +92,22 @@ export default function EventsPage() {
           <h1 className="text-xl sm:text-2xl font-semibold text-[#e2e8f0]">Eventos</h1>
           <p className="text-[#94a3b8] text-xs sm:text-sm mt-1">Gestiona los eventos deportivos</p>
         </div>
-        <button
-          onClick={() => { setEditing(null); setShowForm(true) }}
-          className="flex items-center gap-1 sm:gap-2 bg-[#f97316] hover:bg-[#ea6a0a] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
-        >
-          <Plus size={16} /> <span className="hidden sm:inline">Nuevo Evento</span>
-        </button>
+        <div className="flex gap-2">
+
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-1 sm:gap-2 bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+            >
+              <Download size={16} />
+              <span className="hidden sm:inline">Exportar</span>
+            </button>
+          <button
+            onClick={() => { setEditing(null); setShowForm(true) }}
+            className="flex items-center gap-1 sm:gap-2 bg-[#f97316] hover:bg-[#ea6a0a] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+          >
+            <Plus size={16} /> <span className="hidden sm:inline">Nuevo Evento</span>
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">

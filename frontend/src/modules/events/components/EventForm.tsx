@@ -53,7 +53,6 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
         animate={{ opacity: 1, scale: 1 }}
         className="bg-[#171923] border border-white/5 rounded-none sm:rounded-xl w-full sm:max-w-lg h-full sm:h-auto overflow-y-auto p-4 sm:p-6"
       >
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-[#e2e8f0]">
             {event ? 'Editar Evento' : 'Nuevo Evento'}
@@ -64,7 +63,6 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Nombre */}
           <input
             placeholder="Nombre del evento"
             value={form.name}
@@ -73,7 +71,6 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
             required
           />
 
-          {/* Descripción */}
           <textarea
             placeholder="Descripción"
             value={form.description}
@@ -81,7 +78,6 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
             className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none resize-none h-20"
           />
 
-          {/* Fecha y Hora */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="date"
@@ -99,7 +95,6 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
             />
           </div>
 
-          {/* Lugar */}
           <input
             placeholder="Lugar"
             value={form.location}
@@ -108,7 +103,6 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
             required
           />
 
-          {/* Imagen URL */}
           <div>
             <label className="block text-[#94a3b8] text-xs mb-1">Imagen URL</label>
             <input
@@ -121,7 +115,6 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
             <p className="text-[#94a3b8] text-xs mt-1">Unsplash o similar. La imagen se ajustará automáticamente.</p>
           </div>
 
-          {/* Distancia, Precio, Cupos */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-[#94a3b8] text-xs mb-1">Distancia</label>
@@ -165,7 +158,6 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
             </div>
           </div>
 
-          {/* Estado (solo edición) */}
           {event && (
             <select
               value={form.status}
@@ -178,7 +170,6 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
             </select>
           )}
 
-          {/* Botones */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               type="button"

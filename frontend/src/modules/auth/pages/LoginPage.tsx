@@ -33,7 +33,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#0f1117] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Fondos sutiles - minimalismo funcional */}
+
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#f97316]/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#8b5cf6]/5 rounded-full blur-3xl" />
 
@@ -43,17 +43,14 @@ export default function LoginPage() {
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="relative z-10 w-full max-w-md"
       >
-        {/* Card con borde suave */}
         <div className="bg-[#171923] border border-white/5 rounded-xl p-8">
           
-          {/* Logo */}
           <div className="text-center mb-8">
             <img src={logo} alt="Marathon" className="w-14 h-12 mx-auto mb-4" />
             <h1 className="text-xl font-semibold text-[#e2e8f0]">Marathon</h1>
             <p className="text-[#94a3b8] text-sm mt-1">Bienvenido de Nuevo</p>
           </div>
 
-          {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" size={18} />
