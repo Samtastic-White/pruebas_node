@@ -15,7 +15,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-form": "^1.32.0",
     "@tanstack/react-query": "^5.100.9",
+    "@tanstack/react-query-devtools": "^5.100.10",
     "axios": "^1.16.0",
     "exceljs": "^4.4.0",
     "framer-motion": "^12.38.0",
@@ -24,7 +26,8 @@
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.15.0",
     "sonner": "^2.0.7",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",

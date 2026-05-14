@@ -19,7 +19,6 @@ export const runnerService = {
         return null
       }
       
-      // Obtener inscripciones
       const inscriptions = await db('registrations')
         .join('events', 'registrations.event_id', 'events.id')
         .where({ runner_id: runner.id })
