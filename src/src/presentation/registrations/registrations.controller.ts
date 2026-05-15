@@ -43,7 +43,6 @@ export const createRegistration = async (req: Request, res: Response) => {
 export const cancelRegistration = async (req: Request, res: Response) => {
   try {
     const result = await registrationService.cancel(Number(req.params.id))
-    
     if (!result) return res.status(404).json({ error: 'Inscripción no encontrada' })
     
     res.json({ message: 'Inscripción cancelada' })
