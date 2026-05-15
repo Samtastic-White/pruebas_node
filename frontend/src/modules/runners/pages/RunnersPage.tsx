@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Search, IdCard, Mail, Phone, Calendar, History } from 'lucide-react'
+import { Search, IdCard, Mail, Phone, Calendar, History, Download } from 'lucide-react'
+import ExportButton from '../../../shared/components/ExportButton'
 import api from '../../../config/api'
 import { toast } from 'sonner'
 import type { RunnerWithHistory } from '../types/runner.types'
@@ -14,11 +15,11 @@ export default function RunnersPage() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!dni.trim()) return
-    
+
     setLoading(true)
     setNotFound(false)
     setRunner(null)
-    
+
     try {
       const data = await api.get(`/runners/${dni}`).then(r => r.data)
       setRunner(data)
@@ -32,6 +33,13 @@ export default function RunnersPage() {
       setLoading(false)
     }
   }
+
+  const exportData = runner?.inscriptions?.map(ins => ({
+    evento: ins.name,
+    fecha: new Date(ins.event_date.split('T')[0] + 'T12:00:00').toLocaleDateString('es-CO'),
+    estado: ins.status === 'confirmed' ? 'Confirmado' : 'Cancelado',
+    inscripcion: new Date(ins.created_at.split('T')[0] + 'T12:00:00').toLocaleDateString('es-CO'),
+  })) || []
 
   const statusBadge = (status: string) => {
     const colors: Record<string, string> = {
@@ -136,9 +144,23 @@ export default function RunnersPage() {
           </div>
 
           <div className="bg-[#171923] border border-white/5 rounded-xl overflow-x-auto">
-            <div className="p-4 border-b border-white/5 flex items-center gap-2">
-              <History size={18} className="text-[#f97316]" />
-              <h2 className="text-lg font-semibold text-[#e2e8f0]">Historial de Carreras</h2>
+            <div className="p-4 border-b border-white/5 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <History size={18} className="text-[#f97316]" />
+                <h2 className="text-lg font-semibold text-[#e2e8f0]">Historial de Carreras</h2>
+              </div>
+              <ExportButton
+                data={exportData}
+                columns={[
+                  { header: 'Evento', key: 'evento', width: 30, col: 2 },
+                  { header: 'Fecha Evento', key: 'fecha', width: 14, col: 3 },
+                  { header: 'Estado', key: 'estado', width: 12, col: 4 },
+                  { header: 'Fecha Inscripción', key: 'inscripcion', width: 16, col: 5 },
+                ]}
+                filename={`historial-${runner.dni}`}
+                templateKey="runners"
+                label="Exportar historial"
+              />
             </div>
             <table className="w-full text-left min-w-[600px]">
               <thead>
@@ -164,9 +186,7 @@ export default function RunnersPage() {
                 ))}
                 {!runner.inscriptions?.length && (
                   <tr>
-                    <td colSpan={4} className="py-8 text-center text-[#94a3b8]">
-                      Sin carreras registradas
-                    </td>
+                    <td colSpan={4} className="py-8 text-center text-[#94a3b8]">Sin carreras registradas</td>
                   </tr>
                 )}
               </tbody>

@@ -72,6 +72,12 @@ export const ErrorMessages: Record<string, {
     type: 'validation_error',
     public: true,
   },
+  [ErrorCodes.EVENT_PRICE_INVALID_TYPE]: {
+    code: ErrorCodes.EVENT_PRICE_INVALID_TYPE,
+    description: 'El precio debe ser un número',
+    type: 'validation_error',
+    public: true,
+  },
   [ErrorCodes.EVENT_PRICE_NEGATIVE]: {
     code: ErrorCodes.EVENT_PRICE_NEGATIVE,
     description: 'El precio no puede ser negativo',
@@ -84,6 +90,18 @@ export const ErrorMessages: Record<string, {
     type: 'validation_error',
     public: true,
   },
+  [ErrorCodes.EVENT_SLOTS_INVALID_TYPE]: {
+    code: ErrorCodes.EVENT_SLOTS_INVALID_TYPE,
+    description: 'Los cupos deben ser un número',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_SLOTS_NOT_INT]: {
+    code: ErrorCodes.EVENT_SLOTS_NOT_INT,
+    description: 'Los cupos deben ser un número entero',
+    type: 'validation_error',
+    public: true,
+  },
   [ErrorCodes.EVENT_SLOTS_MIN]: {
     code: ErrorCodes.EVENT_SLOTS_MIN,
     description: 'Los cupos no pueden ser menos de 1',
@@ -93,6 +111,12 @@ export const ErrorMessages: Record<string, {
   [ErrorCodes.EVENT_SLOTS_MAX]: {
     code: ErrorCodes.EVENT_SLOTS_MAX,
     description: 'Los cupos no pueden exceder 99999',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_IMAGE_URL_INVALID]: {
+    code: ErrorCodes.EVENT_IMAGE_URL_INVALID,
+    description: 'URL de imagen inválida',
     type: 'validation_error',
     public: true,
   },
@@ -212,6 +236,12 @@ export const ErrorMessages: Record<string, {
     type: 'validation_error',
     public: true,
   },
+  [ErrorCodes.REG_DNI_INVALID]: {
+    code: ErrorCodes.REG_DNI_INVALID,
+    description: 'El DNI debe contener solo números',
+    type: 'validation_error',
+    public: true,
+  },
   [ErrorCodes.REG_DNI_REQUIRED]: {
     code: ErrorCodes.REG_DNI_REQUIRED,
     description: 'El DNI es requerido',
@@ -245,6 +275,12 @@ export const ErrorMessages: Record<string, {
   [ErrorCodes.REG_PHONE_REQUIRED]: {
     code: ErrorCodes.REG_PHONE_REQUIRED,
     description: 'El teléfono es requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_PHONE_INVALID]: {
+    code: ErrorCodes.REG_PHONE_INVALID,
+    description: 'El teléfono debe contener solo números',
     type: 'validation_error',
     public: true,
   },
@@ -285,6 +321,12 @@ export const ErrorMessages: Record<string, {
     public: false,
   },
 
+  [ErrorCodes.RUN_DNI_INVALID]: {
+    code: ErrorCodes.RUN_DNI_INVALID,
+    description: 'El DNI debe contener solo números',
+    type: 'validation_error',
+    public: true,
+  },
   [ErrorCodes.RUN_DNI_REQUIRED]: {
     code: ErrorCodes.RUN_DNI_REQUIRED,
     description: 'DNI requerido',

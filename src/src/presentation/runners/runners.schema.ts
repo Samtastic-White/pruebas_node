@@ -10,7 +10,8 @@ const msg = (code: string) => {
 export const runnerDniSchema = z.object({
   dni: z
     .string()
-    .min(1, msg('RUN_DNI_REQUIRED')),
+    .min(1, msg('RUN_DNI_REQUIRED'))
+    .regex(/^\d+$/, msg('RUN_DNI_INVALID')),
 })
 
 export type RunnerDniInput = z.infer<typeof runnerDniSchema>

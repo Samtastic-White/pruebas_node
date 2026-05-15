@@ -27,6 +27,13 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
     },
 
     validators: {
+      onMount: ({ value }) => {
+        const result = eventFormSchema.safeParse(value)
+        if (!result.success) {
+          return result.error.issues.map(issue => issue.message)
+        }
+        return undefined
+      },
       onChange: ({ value }) => {
         const result = eventFormSchema.safeParse(value)
         if (!result.success) {

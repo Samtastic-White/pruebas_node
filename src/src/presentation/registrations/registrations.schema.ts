@@ -21,7 +21,8 @@ export const createRegistrationSchema = z.object({
   dni: z
     .string()
     .min(1, msg('REG_DNI_REQUIRED'))
-    .max(20, msg('REG_DNI_MAX_LENGTH')),
+    .max(20, msg('REG_DNI_MAX_LENGTH'))
+    .regex(/^\d+$/, msg('REG_DNI_INVALID')),
 
   email: z
     .string()
@@ -32,7 +33,8 @@ export const createRegistrationSchema = z.object({
   phone: z
     .string()
     .min(1, msg('REG_PHONE_REQUIRED'))
-    .max(20, msg('REG_PHONE_MAX_LENGTH')),
+    .max(20, msg('REG_PHONE_MAX_LENGTH'))
+    .regex(/^\d+$/, msg('REG_DNI_INVALID')),
 })
 
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>

@@ -1,5 +1,6 @@
-import { Routes, Route } from 'react-router-dom'  // ← Quita BrowserRouter de aquí
+import { Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Toaster } from 'sonner'
 import { Layout } from './shared/components/Layout'
 import LoginPage from './modules/auth/pages/LoginPage'
@@ -29,6 +30,7 @@ export default function App() {
         </Route>
       </Routes>
       <Toaster position="top-right" theme="dark" />
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
 }

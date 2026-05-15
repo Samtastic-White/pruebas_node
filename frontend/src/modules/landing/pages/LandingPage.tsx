@@ -8,11 +8,13 @@ import type { Event } from '../types/event.types'
 
 export default function LandingPage() {
   const { data: events } = useEvents()
+  
   const activeEvents = events
     ?.filter(e => e.status === 'active' || e.status === 'finished')
-    .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()) || 
-  []
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(activeEvents[0] || null)
+    .sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime()) || []
+
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [inscriptionEvent, setInscriptionEvent] = useState<Event | null>(null)
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
@@ -21,21 +23,26 @@ export default function LandingPage() {
     }
   }, [activeEvents])
 
+  const handleOpenInscription = () => {
+    setInscriptionEvent(selectedEvent)
+    setShowModal(true)
+  }
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
       <HeroSection
         evento={selectedEvent}
-        onInscribirse={() => setShowModal(true)}
+        onInscribirse={handleOpenInscription}
       />
       <NextEvents
         eventos={activeEvents}
         eventoActivoId={selectedEvent?.id || null}
         onSeleccionar={setSelectedEvent}
       />
-      {showModal && selectedEvent && (
+      {showModal && inscriptionEvent && (
         <ModalInscripcion
-          evento={selectedEvent}
+          evento={inscriptionEvent}
           onClose={() => setShowModal(false)}
         />
       )}

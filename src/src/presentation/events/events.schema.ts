@@ -35,7 +35,7 @@ export const createEventSchema = z.object({
     .max(200, msg('EVENT_LOCATION_MAX_LENGTH')),
 
   distance: z
-    .string()
+    .string({ message: msg('EVENT_PRICE_INVALID_TYPE') })
     .min(1, msg('EVENT_DISTANCE_REQUIRED'))
     .max(20, msg('EVENT_DISTANCE_MAX_LENGTH')),
 
@@ -45,15 +45,15 @@ export const createEventSchema = z.object({
     .max(999999.99, msg('EVENT_PRICE_MAX')),
 
   max_slots: z
-    .number()
-    .int()
+    .number({ message: msg('EVENT_SLOTS_INVALID_TYPE') })
+    .int(msg('EVENT_SLOTS_NOT_INT'))
     .min(1, msg('EVENT_SLOTS_MIN'))
     .max(99999, msg('EVENT_SLOTS_MAX'))
     .default(0),
 
   image_url: z
     .string()
-    .url('URL de imagen inválida')
+    .url(msg('EVENT_IMAGE_URL_INVALID'))
     .optional()
     .nullable()
     .or(z.literal('')),

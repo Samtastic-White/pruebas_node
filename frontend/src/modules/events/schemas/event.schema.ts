@@ -15,7 +15,8 @@ export const eventFormSchema = z.object({
 
   event_date: z
     .string()
-    .min(1, msg.EVT_005),
+    .min(1, msg.EVT_005)
+    .regex(/^\d{4}-\d{2}-\d{2}$/, msg.EVT_006),
 
   event_time: z
     .string()
@@ -32,19 +33,20 @@ export const eventFormSchema = z.object({
     .max(20, msg.EVT_011),
 
   price: z
-    .number({ message: 'Debe ser un número' })
-    .min(0, msg.EVT_012)
-    .max(999999.99, msg.EVT_013),
+    .number({ message: msg.EVT_012 })
+    .min(0, msg.EVT_013)
+    .max(999999.99, msg.EVT_017),
 
   max_slots: z
-    .number({ message: 'Debe ser un número' })
-    .int('Debe ser un número entero')
-    .min(0, msg.EVT_014)
-    .max(99999, msg.EVT_015),
+    .number({ message: msg.EVT_014 })
+    .int(msg.EVT_015)
+    .min(0, msg.EVT_016)
+    .max(99999, msg.EVT_018)
+    .default(0),
 
   image_url: z
     .string()
-    .url('URL de imagen inválida')
+    .url(msg.EVT_019)
     .optional()
     .or(z.literal('')),
 

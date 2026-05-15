@@ -5,6 +5,7 @@ import { useRegistrations } from '../hooks/useRegistrations'
 import { useEvents } from '../../events/hooks/useEvents'
 import RegistrationForm from '../components/RegistrationForm'
 import { useDebounce } from '../../../shared/hooks/useDebounce'
+import ExportButton from '../../../shared/components/ExportButton'
 import api from '../../../config/api'
 import { toast } from 'sonner'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -61,6 +62,18 @@ export default function RegistrationsPage() {
     return matchSearch && matchStatus
   })
 
+  const exportData = filtered?.map(r => ({
+    corredor: r.full_name,
+    dni: r.dni,
+    email: r.email || '',
+    telefono: r.phone || '',
+    evento: r.event_name,
+    fecha: r.created_at
+      ? new Date(r.created_at.split('T')[0] + 'T12:00:00').toLocaleDateString('es-CO')
+      : '',
+    estado: r.status === 'confirmed' ? 'Confirmado' : 'Cancelado',
+  })) || []
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -71,18 +84,33 @@ export default function RegistrationsPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-[#e2e8f0]">Inscripciones</h1>
           <p className="text-[#94a3b8] text-xs sm:text-sm mt-1">Gestiona los corredores inscritos</p>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="flex items-center gap-1 sm:gap-2 bg-[#f97316] hover:bg-[#ea6a0a] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
-        >
-          <Plus size={16} /> <span className="hidden sm:inline">Inscribir Corredor</span>
-        </button>
+        <div className="flex gap-2">
+          <ExportButton
+            data={exportData}
+            columns={[
+              { header: 'Corredor', key: 'corredor', width: 30 },
+              { header: 'DNI', key: 'dni', width: 15 },
+              { header: 'Email', key: 'email', width: 30 },
+              { header: 'Teléfono', key: 'telefono', width: 15 },
+              { header: 'Evento', key: 'evento', width: 30 },
+              { header: 'Fecha Inscripción', key: 'fecha', width: 16 },
+              { header: 'Estado', key: 'estado', width: 12 },
+            ]}
+            filename={`inscripciones-${new Date().toISOString().split('T')[0]}`}
+            templateKey="registrations"
+          />
+          <button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-1 sm:gap-2 bg-[#f97316] hover:bg-[#ea6a0a] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+          >
+            <Plus size={16} /> <span className="hidden sm:inline">Inscribir Corredor</span>
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -128,15 +156,11 @@ export default function RegistrationsPage() {
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">{r.email}</td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">{r.event_name}</td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">
-                  {r.created_at ? new Date(r.created_at).toLocaleDateString('es-CO') : '-'}
+                  {r.created_at ? new Date(r.created_at.split('T')[0] + 'T12:00:00').toLocaleDateString('es-CO') : '-'}
                 </td>
                 <td className="py-3 px-4">
                   <button
-                    onClick={() => {
-                      if (confirm('¿Cancelar esta inscripción?')) {
-                        cancelMutation.mutate(r.id)
-                      }
-                    }}
+                    onClick={() => { if (confirm('¿Cancelar esta inscripción?')) cancelMutation.mutate(r.id) }}
                     className="text-[#ef4444] hover:bg-[#ef4444]/10 px-2 py-1 rounded text-xs font-medium transition-colors"
                   >
                     Cancelar

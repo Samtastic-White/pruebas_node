@@ -14,19 +14,21 @@ export const registrationFormSchema = z.object({
 
   dni: z
     .string()
-    .min(1, msg.REG_004)
-    .max(20, msg.REG_005),
+    .min(1, msg.REG_005)
+    .max(20, msg.REG_006)
+    .regex(/^\d+$/, msg.REG_004),
 
   email: z
     .string()
-    .min(1, msg.REG_006)
-    .email(msg.REG_008)
-    .max(150, msg.REG_007),
+    .min(1, msg.REG_007)
+    .email(msg.REG_009)
+    .max(150, msg.REG_008),
 
   phone: z
     .string()
-    .min(1, msg.REG_009)
-    .max(20, msg.REG_010),
+    .min(1, msg.REG_011)
+    .max(20, msg.REG_012)
+    .regex(/^\d+$/, msg.REG_010),
 })
 
 export type RegistrationFormData = z.infer<typeof registrationFormSchema>
