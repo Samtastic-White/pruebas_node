@@ -1,11 +1,69 @@
-import { eventService } from './../../application/events/event.service';
-import { z } from 'zod';
+import { z } from 'zod'
+import { ErrorCodes } from '../../common/errors'
+import { ErrorMessages } from '../../common/errors'
 
-const eventSchema = z.object({
-    name: z
-        .string()
-        .min(1, JSON.stringify())
-        .max(255, JSON.stringify()),
-    description: 
+const msg = (code: string) => {
+  const errorCode = ErrorCodes[code as keyof typeof ErrorCodes]
+  return JSON.stringify(ErrorMessages[errorCode as keyof typeof ErrorMessages])
+}
 
+export const createEventSchema = z.object({
+  name: z
+    .string()
+    .min(1, msg('EVENT_NAME_REQUIRED'))
+    .min(3, msg('EVENT_NAME_MIN_LENGTH'))
+    .max(150, msg('EVENT_NAME_MAX_LENGTH')),
+
+  description: z
+    .string()
+    .max(500, msg('EVENT_DESCRIPTION_MAX_LENGTH'))
+    .optional()
+    .nullable(),
+
+  event_date: z
+    .string()
+    .min(1, msg('EVENT_DATE_REQUIRED'))
+    .regex(/^\d{4}-\d{2}-\d{2}$/, msg('EVENT_DATE_INVALID')),
+
+  event_time: z
+    .string()
+    .min(1, msg('EVENT_TIME_REQUIRED')),
+
+  location: z
+    .string()
+    .min(1, msg('EVENT_LOCATION_REQUIRED'))
+    .max(200, msg('EVENT_LOCATION_MAX_LENGTH')),
+
+  distance: z
+    .string()
+    .min(1, msg('EVENT_DISTANCE_REQUIRED'))
+    .max(20, msg('EVENT_DISTANCE_MAX_LENGTH')),
+
+  price: z
+    .number()
+    .min(0, msg('EVENT_PRICE_NEGATIVE'))
+    .max(999999.99, msg('EVENT_PRICE_MAX')),
+
+  max_slots: z
+    .number()
+    .int()
+    .min(1, msg('EVENT_SLOTS_MIN'))
+    .max(99999, msg('EVENT_SLOTS_MAX'))
+    .default(0),
+
+  image_url: z
+    .string()
+    .url('URL de imagen inválida')
+    .optional()
+    .nullable()
+    .or(z.literal('')),
+
+  status: z
+    .enum(['active', 'inactive', 'finished'])
+    .default('inactive'),
 })
+
+export const updateEventSchema = createEventSchema.partial()
+
+export type CreateEventInput = z.infer<typeof createEventSchema>
+export type UpdateEventInput = z.infer<typeof updateEventSchema>

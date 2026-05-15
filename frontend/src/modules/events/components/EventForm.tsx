@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useForm } from '@tanstack/react-form'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
+import { eventFormSchema } from '../schemas/event.schema'
 import type { Event } from '../types/event.types'
 
 interface Props {
@@ -11,40 +12,41 @@ interface Props {
 }
 
 export default function EventForm({ event, onClose, onSubmit, loading }: Props) {
-  const [form, setForm] = useState({
-    name: '',
-    description: '',
-    event_date: '',
-    event_time: '',
-    location: '',
-    distance: '10K',
-    price: 0,
-    max_slots: 0,
-    status: 'inactive',
-    image_url: '',
+  const form = useForm({
+    defaultValues: {
+      name: event?.name || '',
+      description: event?.description || '',
+      event_date: event?.event_date?.split('T')[0] || '',
+      event_time: event?.event_time?.slice(0, 5) || '',
+      location: event?.location || '',
+      distance: event?.distance || '10K',
+      price: Number(event?.price) || 0,
+      max_slots: event?.max_slots || 0,
+      image_url: event?.image_url || '',
+      status: (event?.status || 'inactive') as 'active' | 'inactive' | 'finished',
+    },
+
+    validators: {
+      onChange: ({ value }) => {
+        const result = eventFormSchema.safeParse(value)
+        if (!result.success) {
+          return result.error.issues.map(issue => issue.message)
+        }
+        return undefined
+      },
+      onSubmit: ({ value }) => {
+        const result = eventFormSchema.safeParse(value)
+        if (!result.success) {
+          return result.error.issues.map(issue => issue.message)
+        }
+        return undefined
+      },
+    },
+
+    onSubmit: ({ value }) => {
+      onSubmit(value)
+    },
   })
-
-  useEffect(() => {
-    if (event) {
-      setForm({
-        name: event.name,
-        description: event.description || '',
-        event_date: event.event_date?.split('T')[0] || '',
-        event_time: event.event_time?.slice(0, 5) || '',
-        location: event.location,
-        distance: event.distance,
-        price: Number(event.price),
-        max_slots: event.max_slots,
-        status: event.status,
-        image_url: event.image_url || '',
-      })
-    }
-  }, [event])
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit(form)
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm">
@@ -62,112 +64,188 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            placeholder="Nombre del evento"
-            value={form.name}
-            onChange={e => setForm({ ...form, name: e.target.value })}
-            className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
-            required
-          />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            form.handleSubmit()
+          }}
+          className="space-y-4"
+        >
+          <form.Field name="name">
+            {(field) => (
+              <div>
+                <input
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onBlur={field.handleBlur}
+                  placeholder="Nombre del evento"
+                  className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
+                />
+                {field.state.meta.errors.map((error) => (
+                  <p key={error} className="text-[#ef4444] text-xs mt-1">{error}</p>
+                ))}
+              </div>
+            )}
+          </form.Field>
 
-          <textarea
-            placeholder="Descripción"
-            value={form.description}
-            onChange={e => setForm({ ...form, description: e.target.value })}
-            className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none resize-none h-20"
-          />
+          <form.Field name="description">
+            {(field) => (
+              <textarea
+                value={field.state.value || ''}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Descripción"
+                className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none resize-none h-20"
+              />
+            )}
+          </form.Field>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input
-              type="date"
-              value={form.event_date}
-              onChange={e => setForm({ ...form, event_date: e.target.value })}
-              className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] focus:border-[#f97316] focus:outline-none [color-scheme:dark]"
-              required
-            />
-            <input
-              type="time"
-              value={form.event_time}
-              onChange={e => setForm({ ...form, event_time: e.target.value })}
-              className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] focus:border-[#f97316] focus:outline-none [color-scheme:dark]"
-              required
-            />
+            <form.Field name="event_date">
+              {(field) => (
+                <div>
+                  <input
+                    type="date"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] focus:border-[#f97316] focus:outline-none [color-scheme:dark]"
+                  />
+                  {field.state.meta.errors.map((error) => (
+                    <p key={error} className="text-[#ef4444] text-xs mt-1">{error}</p>
+                  ))}
+                </div>
+              )}
+            </form.Field>
+
+            <form.Field name="event_time">
+              {(field) => (
+                <div>
+                  <input
+                    type="time"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] focus:border-[#f97316] focus:outline-none [color-scheme:dark]"
+                  />
+                  {field.state.meta.errors.map((error) => (
+                    <p key={error} className="text-[#ef4444] text-xs mt-1">{error}</p>
+                  ))}
+                </div>
+              )}
+            </form.Field>
           </div>
 
-          <input
-            placeholder="Lugar"
-            value={form.location}
-            onChange={e => setForm({ ...form, location: e.target.value })}
-            className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
-            required
-          />
-
-          <div>
-            <label className="block text-[#94a3b8] text-xs mb-1">Imagen URL</label>
-            <input
-              type="url"
-              placeholder="https://images.unsplash.com/photo-..."
-              value={form.image_url}
-              onChange={e => setForm({ ...form, image_url: e.target.value })}
-              className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
-            />
-            <p className="text-[#94a3b8] text-xs mt-1">Unsplash o similar. La imagen se ajustará automáticamente.</p>
-          </div>
+          <form.Field name="location">
+            {(field) => (
+              <div>
+                <input
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Lugar"
+                  className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
+                />
+                {field.state.meta.errors.map((error) => (
+                  <p key={error} className="text-[#ef4444] text-xs mt-1">{error}</p>
+                ))}
+              </div>
+            )}
+          </form.Field>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-[#94a3b8] text-xs mb-1">Distancia</label>
-              <input
-                type="text"
-                list="distancias"
-                placeholder="10K, 21K..."
-                value={form.distance}
-                onChange={e => setForm({ ...form, distance: e.target.value })}
-                className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
-                required
-              />
-              <datalist id="distancias">
-                <option value="3K" /><option value="5K" /><option value="8K" />
-                <option value="10K" /><option value="15K" /><option value="21K" />
-                <option value="42K" /><option value="50K" /><option value="80K" />
-                <option value="100K" /><option value="Trail" /><option value="Ultra" />
-                <option value="Cross" /><option value="Relevos" />
-              </datalist>
-            </div>
-            <div>
-              <label className="block text-[#94a3b8] text-xs mb-1">Precio ($)</label>
-              <input
-                type="number"
-                placeholder="25.00"
-                value={form.price}
-                onChange={e => setForm({ ...form, price: Number(e.target.value) })}
-                className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-[#94a3b8] text-xs mb-1">Cupos</label>
-              <input
-                type="number"
-                placeholder="0 = ilimitado"
-                value={form.max_slots}
-                onChange={e => setForm({ ...form, max_slots: Number(e.target.value) })}
-                className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
-              />
-            </div>
+            <form.Field name="distance">
+              {(field) => (
+                <div>
+                  <label className="block text-[#94a3b8] text-xs mb-1">Distancia</label>
+                  <input
+                    type="text"
+                    list="distancias"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder="10K, 21K..."
+                    className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
+                  />
+                  <datalist id="distancias">
+                    <option value="3K" /><option value="5K" /><option value="8K" />
+                    <option value="10K" /><option value="15K" /><option value="21K" />
+                    <option value="42K" /><option value="50K" /><option value="80K" />
+                    <option value="100K" /><option value="Trail" /><option value="Ultra" />
+                    <option value="Cross" /><option value="Relevos" />
+                  </datalist>
+                  {field.state.meta.errors.map((error) => (
+                    <p key={error} className="text-[#ef4444] text-xs mt-1">{error}</p>
+                  ))}
+                </div>
+              )}
+            </form.Field>
+
+            <form.Field name="price">
+              {(field) => (
+                <div>
+                  <label className="block text-[#94a3b8] text-xs mb-1">Precio ($)</label>
+                  <input
+                    type="number"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    placeholder="25.00"
+                    className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
+                  />
+                  {field.state.meta.errors.map((error) => (
+                    <p key={error} className="text-[#ef4444] text-xs mt-1">{error}</p>
+                  ))}
+                </div>
+              )}
+            </form.Field>
+
+            <form.Field name="max_slots">
+              {(field) => (
+                <div>
+                  <label className="block text-[#94a3b8] text-xs mb-1">Cupos</label>
+                  <input
+                    type="number"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    placeholder="0 = ilimitado"
+                    className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
+                  />
+                  {field.state.meta.errors.map((error) => (
+                    <p key={error} className="text-[#ef4444] text-xs mt-1">{error}</p>
+                  ))}
+                </div>
+              )}
+            </form.Field>
           </div>
 
+          <form.Field name="image_url">
+            {(field) => (
+              <div>
+                <label className="block text-[#94a3b8] text-xs mb-1">Imagen URL</label>
+                <input
+                  type="url"
+                  value={field.state.value || ''}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="https://images.unsplash.com/photo-..."
+                  className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] placeholder-[#94a3b8] focus:border-[#f97316] focus:outline-none"
+                />
+                {field.state.meta.errors.map((error) => (
+                  <p key={error} className="text-[#ef4444] text-xs mt-1">{error}</p>
+                ))}
+              </div>
+            )}
+          </form.Field>
+
           {event && (
-            <select
-              value={form.status}
-              onChange={e => setForm({ ...form, status: e.target.value })}
-              className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] focus:border-[#f97316] focus:outline-none"
-            >
-              <option value="inactive">Inactivo</option>
-              <option value="active">Activo</option>
-              <option value="finished">Finalizado</option>
-            </select>
+            <form.Field name="status">
+              {(field) => (
+                <select
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value as 'active' | 'inactive' | 'finished')}
+                  className="w-full bg-[#0f1117] border border-white/5 rounded-lg py-2.5 px-4 text-sm text-[#e2e8f0] focus:border-[#f97316] focus:outline-none"
+                >
+                  <option value="inactive">Inactivo</option>
+                  <option value="active">Activo</option>
+                  <option value="finished">Finalizado</option>
+                </select>
+              )}
+            </form.Field>
           )}
 
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
@@ -178,13 +256,17 @@ export default function EventForm({ event, onClose, onSubmit, loading }: Props) 
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-[#f97316] hover:bg-[#ea6a0a] text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
-            >
-              {loading ? 'Guardando...' : event ? 'Actualizar' : 'Crear'}
-            </button>
+            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+              {([canSubmit, isSubmitting]) => (
+                <button
+                  type="submit"
+                  disabled={!canSubmit || loading}
+                  className="flex-1 bg-[#f97316] hover:bg-[#ea6a0a] text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 text-sm"
+                >
+                  {loading || isSubmitting ? 'Guardando...' : event ? 'Actualizar' : 'Crear'}
+                </button>
+              )}
+            </form.Subscribe>
           </div>
         </form>
       </motion.div>

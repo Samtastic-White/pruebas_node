@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { eventService } from '../../application/events/event.service'
+import { createEventSchema, updateEventSchema } from './events.schema'
 
 export const getEvents = async (_req: Request, res: Response) => {
   try {
@@ -22,7 +23,17 @@ export const getEvent = async (req: Request, res: Response) => {
 
 export const createEvent = async (req: Request, res: Response) => {
   try {
-    const newEvent = await eventService.create(req.body)
+    const validation = createEventSchema.safeParse(req.body)
+
+    if (!validation.success) {
+      const errors = validation.error.issues.map(issues => {
+        try { return JSON.parse(issues.message) }
+        catch { return { description: issues.message } }
+      })
+      return res.status(400).json({ errors })
+    }
+
+    const newEvent = await eventService.create(validation.data)
     res.status(201).json(newEvent)
   } catch (error: any) {
     res.status(500).json({ error: 'Error al crear evento' })
@@ -31,7 +42,17 @@ export const createEvent = async (req: Request, res: Response) => {
 
 export const updateEvent = async (req: Request, res: Response) => {
   try {
-    const updated = await eventService.update(Number(req.params.id), req.body)
+    const validation = updateEventSchema.safeParse(req.body)
+
+    if (!validation.success) {
+      const errors = validation.error.issues.map(issues => {
+        try { return JSON.parse(issues.message) }
+        catch { return { description: issues.message } }
+      })
+      return res.status(400).json({ errors })
+    }
+
+    const updated = await eventService.update(Number(req.params.id), validation.data)
     if (!updated) return res.status(404).json({ error: 'Evento no encontrado' })
     res.json(updated)
   } catch (error: any) {

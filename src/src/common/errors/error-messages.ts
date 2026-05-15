@@ -1,0 +1,337 @@
+import { ErrorCodes } from './error-codes'
+
+export const ErrorMessages: Record<string, {
+  code: string
+  description: string
+  type: 'validation_error' | 'business_error' | 'authentication_error' | 'system_error' | 'not_found'
+  public: boolean
+}> = {
+  [ErrorCodes.EVENT_NAME_REQUIRED]: {
+    code: ErrorCodes.EVENT_NAME_REQUIRED,
+    description: 'El nombre del evento es requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_NAME_MIN_LENGTH]: {
+    code: ErrorCodes.EVENT_NAME_MIN_LENGTH,
+    description: 'El nombre debe tener al menos 3 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_NAME_MAX_LENGTH]: {
+    code: ErrorCodes.EVENT_NAME_MAX_LENGTH,
+    description: 'El nombre no puede exceder 150 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_DESCRIPTION_MAX_LENGTH]: {
+    code: ErrorCodes.EVENT_DESCRIPTION_MAX_LENGTH,
+    description: 'La descripción no puede exceder 500 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_DATE_REQUIRED]: {
+    code: ErrorCodes.EVENT_DATE_REQUIRED,
+    description: 'La fecha del evento es requerida',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_DATE_INVALID]: {
+    code: ErrorCodes.EVENT_DATE_INVALID,
+    description: 'Formato de fecha inválido (YYYY-MM-DD)',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_TIME_REQUIRED]: {
+    code: ErrorCodes.EVENT_TIME_REQUIRED,
+    description: 'La hora del evento es requerida',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_LOCATION_REQUIRED]: {
+    code: ErrorCodes.EVENT_LOCATION_REQUIRED,
+    description: 'El lugar del evento es requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_LOCATION_MAX_LENGTH]: {
+    code: ErrorCodes.EVENT_LOCATION_MAX_LENGTH,
+    description: 'El lugar no puede exceder 200 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_DISTANCE_REQUIRED]: {
+    code: ErrorCodes.EVENT_DISTANCE_REQUIRED,
+    description: 'La distancia es requerida',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_DISTANCE_MAX_LENGTH]: {
+    code: ErrorCodes.EVENT_DISTANCE_MAX_LENGTH,
+    description: 'La distancia no puede exceder 20 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_PRICE_NEGATIVE]: {
+    code: ErrorCodes.EVENT_PRICE_NEGATIVE,
+    description: 'El precio no puede ser negativo',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_PRICE_MAX]: {
+    code: ErrorCodes.EVENT_PRICE_MAX,
+    description: 'El precio no puede exceder 999999.99',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_SLOTS_MIN]: {
+    code: ErrorCodes.EVENT_SLOTS_MIN,
+    description: 'Los cupos no pueden ser menos de 1',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_SLOTS_MAX]: {
+    code: ErrorCodes.EVENT_SLOTS_MAX,
+    description: 'Los cupos no pueden exceder 99999',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_NOT_FOUND]: {
+    code: ErrorCodes.EVENT_NOT_FOUND,
+    description: 'Evento no encontrado',
+    type: 'not_found',
+    public: true,
+  },
+  [ErrorCodes.EVENT_HAS_REGISTRATIONS]: {
+    code: ErrorCodes.EVENT_HAS_REGISTRATIONS,
+    description: 'No se puede eliminar un evento con inscripciones',
+    type: 'business_error',
+    public: true,
+  },
+  [ErrorCodes.EVENT_CREATE_DB_ERROR]: {
+    code: ErrorCodes.EVENT_CREATE_DB_ERROR,
+    description: 'Error al insertar evento en la base de datos',
+    type: 'system_error',
+    public: false,
+  },
+  [ErrorCodes.EVENT_UPDATE_DB_ERROR]: {
+    code: ErrorCodes.EVENT_UPDATE_DB_ERROR,
+    description: 'Error al actualizar evento en la base de datos',
+    type: 'system_error',
+    public: false,
+  },
+  [ErrorCodes.EVENT_DELETE_DB_ERROR]: {
+    code: ErrorCodes.EVENT_DELETE_DB_ERROR,
+    description: 'Error al eliminar evento en la base de datos',
+    type: 'system_error',
+    public: false,
+  },
+
+  [ErrorCodes.AUTH_USERNAME_REQUIRED]: {
+    code: ErrorCodes.AUTH_USERNAME_REQUIRED,
+    description: 'El usuario es requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.AUTH_USERNAME_MAX_LENGTH]: {
+    code: ErrorCodes.AUTH_USERNAME_MAX_LENGTH,
+    description: 'El usuario no puede exceder 50 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.AUTH_PASSWORD_REQUIRED]: {
+    code: ErrorCodes.AUTH_PASSWORD_REQUIRED,
+    description: 'La contraseña es requerida',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.AUTH_PASSWORD_MAX_LENGTH]: {
+    code: ErrorCodes.AUTH_PASSWORD_MAX_LENGTH,
+    description: 'La contraseña no puede exceder 100 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.AUTH_INVALID_CREDENTIALS]: {
+    code: ErrorCodes.AUTH_INVALID_CREDENTIALS,
+    description: 'Credenciales inválidas',
+    type: 'authentication_error',
+    public: true,
+  },
+  [ErrorCodes.AUTH_TOKEN_NOT_PROVIDED]: {
+    code: ErrorCodes.AUTH_TOKEN_NOT_PROVIDED,
+    description: 'Token no proporcionado',
+    type: 'authentication_error',
+    public: true,
+  },
+  [ErrorCodes.AUTH_TOKEN_INVALID]: {
+    code: ErrorCodes.AUTH_TOKEN_INVALID,
+    description: 'Token inválido o expirado',
+    type: 'authentication_error',
+    public: false,
+  },
+  [ErrorCodes.AUTH_NEW_PASSWORD_MIN]: {
+    code: ErrorCodes.AUTH_NEW_PASSWORD_MIN,
+    description: 'La nueva contraseña debe tener al menos 6 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.AUTH_PASSWORD_SAME]: {
+    code: ErrorCodes.AUTH_PASSWORD_SAME,
+    description: 'La nueva contraseña debe ser diferente a la actual',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.AUTH_VERIFY_DB_ERROR]: {
+    code: ErrorCodes.AUTH_VERIFY_DB_ERROR,
+    description: 'Error al verificar credenciales en base de datos',
+    type: 'system_error',
+    public: false,
+  },
+  [ErrorCodes.AUTH_JWT_GENERATE_ERROR]: {
+    code: ErrorCodes.AUTH_JWT_GENERATE_ERROR,
+    description: 'Error al generar token JWT',
+    type: 'system_error',
+    public: false,
+  },
+
+  [ErrorCodes.REG_EVENT_ID_REQUIRED]: {
+    code: ErrorCodes.REG_EVENT_ID_REQUIRED,
+    description: 'El evento es requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_FULL_NAME_REQUIRED]: {
+    code: ErrorCodes.REG_FULL_NAME_REQUIRED,
+    description: 'El nombre del corredor es requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_FULL_NAME_MAX_LENGTH]: {
+    code: ErrorCodes.REG_FULL_NAME_MAX_LENGTH,
+    description: 'El nombre no puede exceder 100 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_DNI_REQUIRED]: {
+    code: ErrorCodes.REG_DNI_REQUIRED,
+    description: 'El DNI es requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_DNI_MAX_LENGTH]: {
+    code: ErrorCodes.REG_DNI_MAX_LENGTH,
+    description: 'El DNI no puede exceder 20 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_EMAIL_REQUIRED]: {
+    code: ErrorCodes.REG_EMAIL_REQUIRED,
+    description: 'El email es requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_EMAIL_MAX_LENGTH]: {
+    code: ErrorCodes.REG_EMAIL_MAX_LENGTH,
+    description: 'El email no puede exceder 150 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_EMAIL_INVALID]: {
+    code: ErrorCodes.REG_EMAIL_INVALID,
+    description: 'Formato de email inválido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_PHONE_REQUIRED]: {
+    code: ErrorCodes.REG_PHONE_REQUIRED,
+    description: 'El teléfono es requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_PHONE_MAX_LENGTH]: {
+    code: ErrorCodes.REG_PHONE_MAX_LENGTH,
+    description: 'El teléfono no puede exceder 20 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.REG_EVENT_NOT_FOUND]: {
+    code: ErrorCodes.REG_EVENT_NOT_FOUND,
+    description: 'Evento no encontrado',
+    type: 'not_found',
+    public: true,
+  },
+  [ErrorCodes.REG_EVENT_NOT_ACTIVE]: {
+    code: ErrorCodes.REG_EVENT_NOT_ACTIVE,
+    description: 'El evento no está activo',
+    type: 'business_error',
+    public: true,
+  },
+  [ErrorCodes.REG_SLOTS_EXHAUSTED]: {
+    code: ErrorCodes.REG_SLOTS_EXHAUSTED,
+    description: 'Cupos agotados para este evento',
+    type: 'business_error',
+    public: true,
+  },
+  [ErrorCodes.REG_DNI_DUPLICATED]: {
+    code: ErrorCodes.REG_DNI_DUPLICATED,
+    description: 'Ya estás inscrito en este evento',
+    type: 'business_error',
+    public: true,
+  },
+  [ErrorCodes.REG_CREATE_DB_ERROR]: {
+    code: ErrorCodes.REG_CREATE_DB_ERROR,
+    description: 'Error al crear inscripción en base de datos',
+    type: 'system_error',
+    public: false,
+  },
+
+  [ErrorCodes.RUN_DNI_REQUIRED]: {
+    code: ErrorCodes.RUN_DNI_REQUIRED,
+    description: 'DNI requerido',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.RUN_DNI_MAX_LENGTH]: {
+    code: ErrorCodes.RUN_DNI_MAX_LENGTH,
+    description: 'El DNI no puede exceder 20 caracteres',
+    type: 'validation_error',
+    public: true,
+  },
+  [ErrorCodes.RUN_NOT_FOUND]: {
+    code: ErrorCodes.RUN_NOT_FOUND,
+    description: 'Corredor no encontrado',
+    type: 'not_found',
+    public: true,
+  },
+  [ErrorCodes.RUN_SEARCH_DB_ERROR]: {
+    code: ErrorCodes.RUN_SEARCH_DB_ERROR,
+    description: 'Error al buscar corredor en base de datos',
+    type: 'system_error',
+    public: false,
+  },
+
+  [ErrorCodes.SYS_INTERNAL_ERROR]: {
+    code: ErrorCodes.SYS_INTERNAL_ERROR,
+    description: 'Error interno del servidor',
+    type: 'system_error',
+    public: true,
+  },
+  [ErrorCodes.SYS_ROUTE_NOT_FOUND]: {
+    code: ErrorCodes.SYS_ROUTE_NOT_FOUND,
+    description: 'Ruta no encontrada',
+    type: 'not_found',
+    public: true,
+  },
+  [ErrorCodes.SYS_PG_CONNECTION_ERROR]: {
+    code: ErrorCodes.SYS_PG_CONNECTION_ERROR,
+    description: 'Error de conexión a PostgreSQL',
+    type: 'system_error',
+    public: false,
+  },
+  [ErrorCodes.SYS_MONGO_CONNECTION_ERROR]: {
+    code: ErrorCodes.SYS_MONGO_CONNECTION_ERROR,
+    description: 'Error de conexión a MongoDB',
+    type: 'system_error',
+    public: false,
+  },
+}

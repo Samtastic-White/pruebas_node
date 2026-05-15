@@ -1,3 +1,16 @@
 import { z } from 'zod'
+import { ErrorCodes } from '../../common/errors'
+import { ErrorMessages } from '../../common/errors'
 
-export const createRunner
+const msg = (code: string) => {
+  const errorCode = ErrorCodes[code as keyof typeof ErrorCodes]
+  return JSON.stringify(ErrorMessages[errorCode as keyof typeof ErrorMessages])
+}
+
+export const runnerDniSchema = z.object({
+  dni: z
+    .string()
+    .min(1, msg('RUN_DNI_REQUIRED')),
+})
+
+export type RunnerDniInput = z.infer<typeof runnerDniSchema>
