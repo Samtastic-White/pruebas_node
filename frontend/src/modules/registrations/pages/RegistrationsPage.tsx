@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRegistrations } from '../hooks/useRegistrations'
 import { useEvents } from '../../events/hooks/useEvents'
 import RegistrationForm from '../components/RegistrationForm'
@@ -61,6 +61,22 @@ export default function RegistrationsPage() {
 
     return matchSearch && matchStatus
   })
+  
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, statusFilter])
+
+  const safeFiltered = filtered ?? []
+  const totalPages = Math.ceil(safeFiltered.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedData = safeFiltered.slice(startIndex, startIndex + itemsPerPage)
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page)
+  }
 
   const exportData = filtered?.map(r => ({
     corredor: r.full_name,
@@ -149,7 +165,7 @@ export default function RegistrationsPage() {
             </tr>
           </thead>
           <tbody>
-            {filtered?.map((r) => (
+            {paginatedData.map((r) => (
               <tr key={r.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                 <td className="py-3 px-4 text-[#e2e8f0] font-medium text-sm">{r.full_name}</td>
                 <td className="py-3 px-4 text-[#94a3b8] text-sm">{r.dni}</td>
@@ -188,6 +204,29 @@ export default function RegistrationsPage() {
           onSubmit={handleCreate}
           loading={loading}
         />
+      )}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 pt-2">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="flex items-center justify-center w-9 h-9 bg-[#171923] border border-white/5 rounded-lg text-[#e2e8f0] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          <span className="text-[#94a3b8] text-sm min-w-[100px] text-center">
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="flex items-center justify-center w-9 h-9 bg-[#171923] border border-white/5 rounded-lg text-[#e2e8f0] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
       )}
     </motion.div>
   )

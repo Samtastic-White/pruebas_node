@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Search, IdCard, Mail, Phone, Calendar, History, Download } from 'lucide-react'
+import { Search, IdCard, Mail, Phone, Calendar, History, Download, ChevronRight, ChevronLeft } from 'lucide-react'
 import ExportButton from '../../../shared/components/ExportButton'
 import api from '../../../config/api'
 import { toast } from 'sonner'
@@ -11,6 +11,21 @@ export default function RunnersPage() {
   const [runner, setRunner] = useState<RunnerWithHistory | null>(null)
   const [notFound, setNotFound] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  const inscriptions = runner?.inscriptions ?? []
+  const totalPages = Math.ceil(inscriptions.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedInscriptions = inscriptions.slice(startIndex, startIndex + itemsPerPage)
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page)
+  }
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [runner])
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -172,7 +187,7 @@ export default function RunnersPage() {
                 </tr>
               </thead>
               <tbody>
-                {runner.inscriptions?.map((ins, i) => (
+                {paginatedInscriptions.map((ins, i) => (
                   <tr key={i} className="border-b border-white/5">
                     <td className="py-3 px-4 text-[#e2e8f0]">{ins.name}</td>
                     <td className="py-3 px-4 text-[#94a3b8] text-sm">
@@ -184,7 +199,7 @@ export default function RunnersPage() {
                     </td>
                   </tr>
                 ))}
-                {!runner.inscriptions?.length && (
+                {inscriptions.length === 0 && (
                   <tr>
                     <td colSpan={4} className="py-8 text-center text-[#94a3b8]">Sin carreras registradas</td>
                   </tr>
@@ -192,6 +207,29 @@ export default function RunnersPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 pt-4">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="flex items-center justify-center w-9 h-9 bg-[#171923] border border-white/5 rounded-lg text-[#e2e8f0] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          <span className="text-[#94a3b8] text-sm min-w-[100px] text-center">
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="flex items-center justify-center w-9 h-9 bg-[#171923] border border-white/5 rounded-lg text-[#e2e8f0] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronRight size={16} />
+          </button>
         </div>
       )}
     </motion.div>

@@ -48,11 +48,10 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
         if (hasPrice) {
           const paymentAmount = Math.round(Number(evento.price) * 100)
           const { data } = await api.post('/payment', {
-            amount: paymentAmount,
             registrationData: value,
           })
           setClientSecret(data.clientSecret)
-          setFormData({ ...value, amount: paymentAmount })
+          setFormData({ ...value, amount: data.Amount })
           setStep('payment')
         } else {
           await api.post('/registrations', value)

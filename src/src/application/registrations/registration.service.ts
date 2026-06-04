@@ -66,6 +66,7 @@ export const registrationService = {
         payment_intent_id: data.payment_intent_id,
         status: data.payment_intent_id ? 'confirmed' : 'pending',
         amount: data.amount,
+        receipt_url: (data as any).receipt_url,
       })
       
       await log('success', 'REGISTRATION_CREATED', { registration_id: registration.id, event_id: data.event_id, dni: data.dni, payment_status: data.payment_intent_id ? 'paid' : 'free' })

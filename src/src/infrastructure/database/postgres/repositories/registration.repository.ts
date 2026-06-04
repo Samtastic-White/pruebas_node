@@ -16,7 +16,8 @@ export const registrationRepository = {
       'runners.full_name',
       'runners.dni',
       'runners.email'
-    ),
+    )
+    .orderBy('registrations.created_at', 'desc'),
   
   findByEvent: (eventId: number) => db('registrations')
     .join('runners', 'registrations.runner_id', 'runners.id')

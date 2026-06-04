@@ -23,7 +23,82 @@
   margin-top: 0.25rem;
 }
 
-/* Search + Filter */
+.facturaButtonDisabled {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #94a3b8;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  width: fit-content;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionCell {
+  padding: 0.75rem 1rem;
+}
+
+.facturaButton {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #f97316;
+  color: #ffffff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s;
+  width: fit-content;
+}
+
+.facturaButton:hover {
+  background: #cb5c0d;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.pageButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: #171923;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: #f97316;
+}
+
+.pageButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  min-width: 100px;
+  text-align: center;
+}
+
 .filters {
   display: flex;
   gap: 0.75rem;
@@ -85,7 +160,6 @@
   color: #e2e8f0;
 }
 
-/* Tabla */
 .tableWrapper {
   background: #171923;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -141,14 +215,12 @@
   color: #94a3b8;
 }
 
-/* Monto */
 .amount {
   color: #22c55e;
   font-weight: 600;
   font-family: 'Courier New', monospace;
 }
 
-/* Badges de estado */
 .badge {
   display: inline-block;
   padding: 0.25rem 0.625rem;
@@ -176,20 +248,17 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-/* Fecha */
 .date {
   color: #94a3b8;
   font-size: 0.8125rem;
 }
 
-/* Empty state */
 .emptyState {
   padding: 3rem;
   text-align: center;
   color: #94a3b8;
 }
 
-/* Loading */
 .loader {
   display: flex;
   align-items: center;
@@ -210,7 +279,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* Payment ID */
 .paymentId {
   font-family: 'Courier New', monospace;
   font-size: 0.75rem;
@@ -224,7 +292,6 @@
   white-space: nowrap;
 }
 
-/* Total */
 .totalBar {
   display: flex;
   align-items: center;

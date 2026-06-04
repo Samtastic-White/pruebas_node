@@ -9,4 +9,5 @@ export interface Invoice {
   payment_status: string
   paid_at: string
   created_at: string
+  receipt_url: string | null;
 }

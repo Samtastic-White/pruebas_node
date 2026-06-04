@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Search } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 import { useInvoices } from '../hooks/useInvoices'
 import { useDebounce } from '../../../shared/hooks/useDebounce'
 import ExportButton from '../../../shared/components/ExportButton'
@@ -60,15 +60,14 @@ const truncatePaymentId = (id: string): string => {
   return id.length > 16 ? `${id.substring(0, 8)}...${id.slice(-4)}` : id
 }
 
-// Componente principal
 export default function InvoicesPage() {
-  // Hooks
   const { data: invoices, isLoading } = useInvoices()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const debouncedSearch = useDebounce(search, 500)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10 
 
-  // Filtrado
   const filtered = invoices?.filter((invoice) => {
     const searchLower = debouncedSearch.toLowerCase()
     const matchSearch =
@@ -83,10 +82,18 @@ export default function InvoicesPage() {
     return matchSearch && matchStatus
   }) ?? []
 
-  // Total
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, statusFilter])
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage)
+
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedData = filtered.slice(startIndex, endIndex)
+
   const totalAmount = filtered.reduce((sum, inv) => sum + (inv.amount || 0), 0)
 
-  // Datos para exportar
   const exportData = filtered.map((inv) => ({
     'ID Pago': inv.payment_intent_id || '-',
     Corredor: inv.full_name,
@@ -98,7 +105,12 @@ export default function InvoicesPage() {
     Fecha: formatDate(inv.paid_at || inv.created_at),
   }))
 
-  // Loading state
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className={styles.loader}>
@@ -113,7 +125,6 @@ export default function InvoicesPage() {
       animate={{ opacity: 1, y: 0 }}
       className={styles.page}
     >
-      {/* Header */}
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Facturas</h1>
@@ -137,7 +148,6 @@ export default function InvoicesPage() {
         />
       </div>
 
-      {/* Filtros */}
       <div className={styles.filters}>
         <div className={styles.searchWrapper}>
           <Search className={styles.searchIcon} size={18} />
@@ -162,7 +172,6 @@ export default function InvoicesPage() {
         </select>
       </div>
 
-      {/* Total */}
       <div className={styles.totalBar}>
         <span className={styles.totalLabel}>
           {filtered.length} factura{filtered.length !== 1 ? 's' : ''}
@@ -172,7 +181,6 @@ export default function InvoicesPage() {
         </span>
       </div>
 
-      {/* Tabla */}
       <div className={styles.tableWrapper}>
         <table className={styles.table}>
           <thead>
@@ -185,51 +193,61 @@ export default function InvoicesPage() {
               <th>Monto</th>
               <th>Estado</th>
               <th>Fecha</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map((invoice) => (
+            {paginatedData.map((invoice) => (
               <tr key={invoice.id}>
-                {/* ID Pago */}
                 <td>
                   <span className={styles.paymentId} title={invoice.payment_intent_id}>
                     {truncatePaymentId(invoice.payment_intent_id)}
                   </span>
                 </td>
 
-                {/* Corredor */}
                 <td className={styles.corredorName}>{invoice.full_name}</td>
 
-                {/* DNI */}
                 <td className={styles.corredorDni}>{invoice.dni}</td>
 
-                {/* Email */}
                 <td className={styles.corredorEmail}>{invoice.email || '-'}</td>
 
-                {/* Evento */}
                 <td className={styles.eventName}>{invoice.event_name}</td>
 
-                {/* Monto */}
                 <td className={styles.amount}>{formatCurrency(invoice.amount)}</td>
 
-                {/* Estado */}
                 <td>
                   <span className={`${styles.badge} ${getStatusClass(invoice.payment_status)}`}>
                     {getStatusLabel(invoice.payment_status)}
                   </span>
                 </td>
 
-                {/* Fecha */}
                 <td className={styles.date}>
                   {formatDate(invoice.paid_at || invoice.created_at)}
+                </td>
+                <td className={styles.actionCell}>
+                  {invoice.receipt_url ? (
+                    <a
+                      href={invoice.receipt_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.facturaButton}
+                    >
+                      <ExternalLink size={14} />
+                      Factura
+                    </a>
+                  ) : (
+                    <span className={styles.facturaButtonDisabled}>
+                      <ExternalLink size={14} />
+                      Pendiente
+                    </span>
+                  )}
                 </td>
               </tr>
             ))}
 
-            {/* Empty state */}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={8} className={styles.emptyState}>
+                <td colSpan={9} className={styles.emptyState}>
                   {search || statusFilter !== 'all'
                     ? 'No se encontraron facturas con esos filtros'
                     : 'No hay facturas registradas aún'}
@@ -239,6 +257,30 @@ export default function InvoicesPage() {
           </tbody>
         </table>
       </div>
+      
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={styles.pageButton}
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          <span className={styles.pageInfo}>
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={styles.pageButton}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}      
     </motion.div>
   )
 }

@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEvents } from '../hooks/useEvents'
 import { useCreateEvent, useUpdateEvent, useDeleteEvent } from '../hooks/useEventMutations'
 import { useEventFilters } from '../hooks/useEventFilters'
@@ -18,6 +18,20 @@ export default function EventsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Event | null>(null)
   const { search, setSearch, statusFilter, setStatusFilter, filtered } = useEventFilters(events)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [search, statusFilter])
+
+  const totalPages = Math.ceil((filtered?.length || 0) / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const paginatedData = (filtered || []).slice(startIndex, startIndex + itemsPerPage)
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page)
+  }
 
   const handleSubmit = (data: any) => {
     if (editing) updateEvent.mutate({ id: editing.id, data })
@@ -86,7 +100,7 @@ export default function EventsPage() {
       />
 
       <EventTable
-        events={filtered || []}
+        events={paginatedData}
         onEdit={(e) => { setEditing(e); setShowForm(true) }}
         onDelete={(e) => { if (confirm('¿Eliminar?')) deleteEvent.mutate(e.id) }}
         isEmpty={!filtered?.length}
@@ -100,6 +114,29 @@ export default function EventsPage() {
           onSubmit={handleSubmit}
           loading={createEvent.isPending || updateEvent.isPending}
         />
+      )}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 pt-2">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="flex items-center justify-center w-9 h-9 bg-[#171923] border border-white/5 rounded-lg text-[#e2e8f0] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          <span className="text-[#94a3b8] text-sm min-w-[100px] text-center">
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="flex items-center justify-center w-9 h-9 bg-[#171923] border border-white/5 rounded-lg text-[#e2e8f0] hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
       )}
     </motion.div>
   )

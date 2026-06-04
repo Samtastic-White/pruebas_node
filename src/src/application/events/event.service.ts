@@ -1,6 +1,10 @@
+import Stripe from 'stripe'
 import { eventRepository } from '../../infrastructure/database/postgres/repositories/event.repository'
 import { logSuccess, logError } from '../../infrastructure/database/mongo/services/logservice'
-import  db  from '../../infrastructure/database/postgres/connection'
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2026-05-27.dahlia'
+})
 
 const log = async (
   type: 'success' | 'error',
@@ -53,7 +57,35 @@ export const eventService = {
 
   create: async (data: any) => {
     try {
-      const newEvent = await eventRepository.create(data)
+      let stripeProductId: string | null = null
+      let stripePriceId: string | null = null
+
+      if (data.price > 0) {
+        const product = await stripe.products.create({
+          name: data.name,
+          description: data.description || undefined,
+          metadata: {
+            location: data.location || '',
+            distance: data.distance || '',
+            event_date: data.event_date || '',
+          },
+        })
+        stripeProductId = product.id
+
+        const price = await stripe.prices.create({
+          product: product.id,
+          unit_amount: Math.round(Number(data.price) * 100),
+          currency: 'usd',
+        })
+        stripePriceId = price.id
+      }
+
+      const newEvent = await eventRepository.create({
+        ...data,
+        stripe_product_id: stripeProductId,
+        stripe_price_id: stripePriceId,
+      })
+
       await log('success', 'EVENT_CREATED', { event_id: newEvent.id, name: newEvent.name })
       return newEvent
     } catch (error: any) {
@@ -64,11 +96,53 @@ export const eventService = {
 
   update: async (id: number, data: any) => {
     try {
-      const updated = await eventRepository.update(id, data)
+      const existingEvent = await eventRepository.findById(id)
+
+      let stripeProductId = existingEvent?.stripe_product_id || null
+      let stripePriceId = existingEvent?.stripe_price_id || null
+
+      if (data.price > 0) {
+        if (stripeProductId) {
+          await stripe.products.update(stripeProductId, {
+            name: data.name,
+            description: data.description || undefined,
+          })
+
+          if (Number(data.price) !== Number(existingEvent?.price)) {
+            const newPrice = await stripe.prices.create({
+              product: stripeProductId,
+              unit_amount: Math.round(Number(data.price) * 100),
+              currency: 'usd',
+            })
+            stripePriceId = newPrice.id
+          }
+        } else {
+          const product = await stripe.products.create({
+            name: data.name,
+            description: data.description || undefined,
+          })
+          stripeProductId = product.id
+
+          const price = await stripe.prices.create({
+            product: product.id,
+            unit_amount: Math.round(Number(data.price) * 100),
+            currency: 'usd',
+          })
+          stripePriceId = price.id
+        }
+      }
+
+      const updated = await eventRepository.update(id, {
+        ...data,
+        stripe_product_id: stripeProductId,
+        stripe_price_id: stripePriceId,
+      })
+
       if (!updated) {
-        await log('error', 'EVENT_NOT_FOUND_UPDATE', `Evento ${id} no encontrado para actualizar`)
+        await log('error', 'EVENT_NOT_FOUND_UPDATE', `Evento ${id} no encontrado`)
         return null
       }
+
       await log('success', 'EVENT_UPDATED', { event_id: updated.id, name: updated.name })
       return updated
     } catch (error: any) {

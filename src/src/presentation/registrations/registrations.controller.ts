@@ -52,17 +52,22 @@ export const createRegistration = async (req: Request, res: Response) => {
 
         if (paymentIntent.metadata.event_id !== String(registrationData.event_id)) {
           return res.status(400).json({
-            error: 'el pago no corresponde a este evento'
+            error: 'El pago no corresponde a este evento'
           });
         }
 
         const existingReg = await registrationRepository.findByPaymentIntent(payment_intent_id);
         if (existingReg) {
           return res.status(400).json({
-            error: 'este pago ya fue utilizado'
+            error: 'Este pago ya fue utilizado'
           });
         }
-        
+
+        const charge = paymentIntent.latest_charge as Stripe.Charge;
+        const receiptUrl = charge?.receipt_url || null;
+
+        (registrationData as any).receipt_url = receiptUrl;
+
       } catch (stripeError: any) {
         console.error('Stripe verification error:', stripeError)
         return res.status(400).json({
