@@ -5,6 +5,18 @@ export const registrationRepository = {
     .join('events', 'registrations.event_id', 'events.id')
     .join('runners', 'registrations.runner_id', 'runners.id')
     .select('registrations.*', 'events.name as event_name', 'runners.full_name', 'runners.dni', 'runners.email'),
+
+  findAllPaid: () => db('registrations')
+    .join('events', 'registrations.event_id', 'events.id')
+    .join('runners', 'registrations.runner_id', 'runners.id')
+    .whereNotNull('registrations.payment_intent_id')
+    .select(
+      'registrations.*',
+      'events.name as event_name',
+      'runners.full_name',
+      'runners.dni',
+      'runners.email'
+    ),
   
   findByEvent: (eventId: number) => db('registrations')
     .join('runners', 'registrations.runner_id', 'runners.id')
@@ -12,6 +24,11 @@ export const registrationRepository = {
     .select('registrations.*', 'runners.full_name', 'runners.dni'),
   
   countByEvent: (eventId: number) => db('registrations').where({ event_id: eventId }).count(),
+
+  findByPaymentIntent: (paymentIntentId: string) => 
+    db('registrations')
+      .where({ payment_intent_id: paymentIntentId })
+      .first(),
   
   create: (data: any) => db('registrations').insert(data).returning('*').then(r => r[0]),
 }

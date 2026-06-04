@@ -1,8 +1,10 @@
 import { Router } from 'express'
 import { eventsRoutes } from './events/events.routes'
-import { registrationsRoutes } from './registrations/registrations.routes'
 import { authRoutes } from './auth/auth.routes'
-import { runnersRoutes } from './runners/runners.routes'
+import { paymentRoutes } from './payment/payment.routes'
+import { registrationsRoutes } from './registrations'
+import { runnersRoutes } from './runners'
+import { invoiceRoutes } from './invoices/invoices.routes'
 
 class AppRouter {
   private readonly router: Router
@@ -18,6 +20,8 @@ class AppRouter {
       { path: '/registrations', router: registrationsRoutes },
       { path: '/auth', router: authRoutes },
       { path: '/runners', router: runnersRoutes },
+      { path: '/payment', router: paymentRoutes },
+      { path: '/invoices', router: invoiceRoutes },
     ]
 
     routes.forEach(({ path, router }) => {

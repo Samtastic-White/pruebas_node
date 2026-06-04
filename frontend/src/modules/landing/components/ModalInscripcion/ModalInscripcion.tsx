@@ -1,7 +1,10 @@
+// components/ModalInscripcion.tsx
+import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { toast } from 'sonner'
 import api from '../../../../config/api'
 import { registrationFormSchema } from '../../../registrations/schemas/registration.schema'
+import { PaymentStep } from '../StripePayment/PaymentStep'
 import type { Event } from '../../types/event.types'
 
 interface Props {
@@ -9,7 +12,16 @@ interface Props {
   onClose: () => void
 }
 
+type Step = 'form' | 'payment'
+
 export default function ModalInscripcion({ evento, onClose }: Props) {
+  const [step, setStep] = useState<Step>('form')
+  const [clientSecret, setClientSecret] = useState('')
+  const [formData, setFormData] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const hasPrice = evento.price && evento.price > 0
+
   const form = useForm({
     defaultValues: {
       event_id: evento.id,
@@ -22,37 +34,69 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
     validators: {
       onMount: ({ value }) => {
         const result = registrationFormSchema.safeParse(value)
-        if (!result.success) {
-          return result.error.issues.map(issue => issue.message)
-        }
-        return undefined
+        if (!result.success) return result.error.issues.map(issue => issue.message)
       },
       onChange: ({ value }) => {
         const result = registrationFormSchema.safeParse(value)
-        if (!result.success) {
-          return result.error.issues.map(issue => issue.message)
-        }
-        return undefined
+        if (!result.success) return result.error.issues.map(issue => issue.message)
       },
     },
 
     onSubmit: async ({ value }) => {
+      setIsLoading(true)
       try {
-        await api.post('/registrations', value)
-        toast.success('¡Inscripción exitosa! Nos vemos en la carrera')
-        onClose()
+        if (hasPrice) {
+          const paymentAmount = Math.round(Number(evento.price) * 100)
+          const { data } = await api.post('/payment', {
+            amount: paymentAmount,
+            registrationData: value,
+          })
+          setClientSecret(data.clientSecret)
+          setFormData({ ...value, amount: paymentAmount })
+          setStep('payment')
+        } else {
+          await api.post('/registrations', value)
+          toast.success('¡Inscripción exitosa! Nos vemos en la carrera')
+          onClose()
+        }
       } catch (error: any) {
         toast.error(error.response?.data?.error || 'Error al inscribir')
+      } finally {
+        setIsLoading(false)
       }
     },
   })
 
-  return (
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
+    try {
+      await api.post('/registrations', {
+        ...formData,
+        payment_intent_id: paymentIntentId,
+      })
+      toast.success('¡Inscripción exitosa! Nos vemos en la carrera')
+      onClose()
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Error al registrar')
+      setStep('form')
+    }
+  }
+
+  return step === 'payment' && clientSecret ? (
+    <PaymentStep
+      evento={evento}
+      clientSecret={clientSecret}
+      onBack={() => setStep('form')}
+      onClose={onClose}
+      onSuccess={handlePaymentSuccess}
+      onError={(e) => toast.error(e)}
+    />
+  ) : (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div
         className="bg-[#111] border border-[#f97316]/25 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
+        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/5">
           <div>
             <p className="text-[#f97316] text-xs font-bold uppercase tracking-wider">Inscripción</p>
@@ -69,6 +113,21 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
           </button>
         </div>
 
+        {/* Badge de precio */}
+        {hasPrice && (
+          <div className="mx-4 mt-4 bg-[#f97316]/10 border border-[#f97316]/25 rounded-lg p-3 flex items-center gap-3">
+            <span>💳</span>
+            <div>
+              <p className="text-[#f97316] text-sm font-semibold">Evento pago</p>
+              <p className="text-white/50 text-xs">Se te redirigirá al pago seguro</p>
+            </div>
+            <span className="ml-auto text-[#f97316] font-bold">
+              ${(evento.price)}
+            </span>
+          </div>
+        )}
+
+        {/* Formulario */}
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -129,7 +188,6 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
             )}
           </form.Field>
 
-          {/* Teléfono */}
           <form.Field name="phone">
             {(field) => (
               <div>
@@ -151,10 +209,14 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
             {([canSubmit, isSubmitting]) => (
               <button
                 type="submit"
-                disabled={!canSubmit || isSubmitting}
+                disabled={!canSubmit || isSubmitting || isLoading}
                 className="w-full bg-[#f97316] hover:bg-[#ea6a0a] text-white py-2.5 rounded-lg font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
               >
-                {isSubmitting ? 'Inscribiendo...' : 'Confirmar inscripción'}
+                {isSubmitting || isLoading
+                  ? 'Preparando...'
+                  : hasPrice
+                    ? 'Continuar al pago'
+                    : 'Confirmar inscripción'}
               </button>
             )}
           </form.Subscribe>

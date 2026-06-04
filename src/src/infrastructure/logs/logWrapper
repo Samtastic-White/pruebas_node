@@ -1,0 +1,26 @@
+import { logSuccess, logError } from '../database/mongo/services/logservice'
+
+export const logWrapper = async <T>(
+  useCase: () => Promise<T>,
+  action: string,
+  module: string
+): Promise<T> => {
+  try {
+    const result = await useCase()
+    await logSuccess({
+      accion: action,
+      usuario: 'admin',
+      modulo: module,
+      detalles: typeof result === 'object' ? result : { result }
+    })
+    return result
+  } catch (error: any) {
+    await logError({
+      accion: action,
+      usuario: 'admin',
+      modulo: module,
+      mensaje: error.message || 'Error desconocido'
+    })
+    throw error
+  }
+}

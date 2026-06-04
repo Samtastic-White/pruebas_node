@@ -27,6 +27,7 @@
     "knex": "^3.2.10",
     "mongoose": "^9.6.1",
     "pg": "^8.20.0",
+    "stripe": "^22.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

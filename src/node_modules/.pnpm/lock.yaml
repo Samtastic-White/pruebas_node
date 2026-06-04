@@ -38,6 +38,9 @@ importers:
       pg:
         specifier: ^8.20.0
         version: 8.20.0
+      stripe:
+        specifier: ^22.2.0
+        version: 22.2.0(@types/node@25.6.0)
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -846,6 +849,15 @@ packages:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
 
+  stripe@22.2.0:
+    resolution: {integrity: sha512-WFGpMOom9QZqso1kcnSwJsCdC1QHDlMoCOxBZRf3JraMzhkfw7dgSdD2a1CFZrqC+mzAfqeEtYILrZhWKIDruA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
@@ -1640,6 +1652,10 @@ snapshots:
   split2@4.2.0: {}
 
   statuses@2.0.2: {}
+
+  stripe@22.2.0(@types/node@25.6.0):
+    optionalDependencies:
+      '@types/node': 25.6.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
 

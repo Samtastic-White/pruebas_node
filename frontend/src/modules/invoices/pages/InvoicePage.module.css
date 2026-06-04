@@ -1,0 +1,247 @@
+/* InvoicesPage.module.css */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Search + Filter */
+.filters {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.searchWrapper {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.searchInput {
+  width: 100%;
+  background: #171923;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem 0.625rem 2.5rem;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.searchInput::placeholder {
+  color: #94a3b8;
+}
+
+.searchInput:focus {
+  border-color: #f97316;
+}
+
+.select {
+  background: #171923;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  outline: none;
+  cursor: pointer;
+  min-width: 180px;
+}
+
+.select:focus {
+  border-color: #f97316;
+}
+
+.select option {
+  background: #171923;
+  color: #e2e8f0;
+}
+
+/* Tabla */
+.tableWrapper {
+  background: #171923;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  text-align: left;
+  min-width: 800px;
+}
+
+.table thead tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table th {
+  padding: 0.75rem 1rem;
+  color: #94a3b8;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.15s;
+}
+
+.table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.corredorName {
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.corredorDni {
+  color: #94a3b8;
+}
+
+.corredorEmail {
+  color: #94a3b8;
+}
+
+.eventName {
+  color: #94a3b8;
+}
+
+/* Monto */
+.amount {
+  color: #22c55e;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+/* Badges de estado */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.badgeSuccess {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.badgePending {
+  background: rgba(249, 115, 22, 0.1);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.2);
+}
+
+.badgeFailed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Fecha */
+.date {
+  color: #94a3b8;
+  font-size: 0.8125rem;
+}
+
+/* Empty state */
+.emptyState {
+  padding: 3rem;
+  text-align: center;
+  color: #94a3b8;
+}
+
+/* Loading */
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 16rem;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid #f97316;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Payment ID */
+.paymentId {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Total */
+.totalBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #171923;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.totalLabel {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.totalAmount {
+  color: #22c55e;
+  font-weight: 700;
+  font-size: 1.125rem;
+}

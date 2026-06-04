@@ -11,6 +11,7 @@ import RegistrationsPage from './modules/registrations/pages/RegistrationsPage'
 import RunnersPage from './modules/runners/pages/RunnersPage'
 import RegisterRunnerPage from './modules/runners/pages/RegisterRunnerPage'
 import ProfilePage from './modules/auth/pages/ProfilePage'
+import InvoicePage from './modules/invoices/pages/InvoicePage'
 
 const queryClient = new QueryClient()
 
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/runners" element={<RunnersPage />} />
           <Route path="/register-runner" element={<RegisterRunnerPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/invoices" element={<InvoicePage />} />
         </Route>
       </Routes>
       <Toaster position="top-right" theme="dark" />
