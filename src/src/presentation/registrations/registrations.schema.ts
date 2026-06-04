@@ -35,6 +35,10 @@ export const createRegistrationSchema = z.object({
     .min(1, msg('REG_PHONE_REQUIRED'))
     .max(20, msg('REG_PHONE_MAX_LENGTH'))
     .regex(/^\d+$/, msg('REG_DNI_INVALID')),
+
+  payment_intent_id: z.string().optional(),
+
+  amount: z.number().optional(),  
 })
 
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>

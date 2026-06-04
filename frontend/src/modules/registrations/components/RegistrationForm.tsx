@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { X, User, IdCard, Mail, Phone } from 'lucide-react'
+import { X, User, IdCard, Mail, Phone, CreditCard } from 'lucide-react'
 import SearchableSelect from '../../../shared/components/SearchableSelect'
 
 interface Props {
-  events: Array<{ id: number; name: string }>
+  events: Array<{ id: number; name: string; price?: number }>
   onClose: () => void
   onSubmit: (data: any) => void
   loading?: boolean
@@ -18,6 +18,9 @@ export default function RegistrationForm({ events, onClose, onSubmit, loading }:
     email: '',
     phone: '',
   })
+
+  const selectedEvent = events.find(e => e.id === form.event_id)
+  const hasPrice = selectedEvent?.price && selectedEvent.price > 0
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,6 +51,18 @@ export default function RegistrationForm({ events, onClose, onSubmit, loading }:
               placeholder="Seleccionar evento..."
             />
           </div>
+          {hasPrice && (
+            <div className="bg-[#f97316]/10 border border-[#f97316]/25 rounded-lg p-3 flex items-center gap-3">
+              <CreditCard className="text-[#f97316]" size={18} />
+              <div>
+                <p className="text-[#f97316] text-sm font-semibold">Evento pago</p>
+                <p className="text-[#94a3b8] text-xs">Se te redirigirá al pago seguro</p>
+              </div>
+              <span className="ml-auto text-[#f97316] font-bold text-lg">
+                ${(selectedEvent.price / 100).toFixed(2)}
+              </span>
+            </div>
+          )}
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" size={18} />
             <input
@@ -102,7 +117,7 @@ export default function RegistrationForm({ events, onClose, onSubmit, loading }:
               disabled={loading}
               className="flex-1 bg-[#f97316] hover:bg-[#ea6a0a] text-white py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50"
             >
-              {loading ? 'Inscribiendo...' : 'Inscribir'}
+              {loading ? 'Preparando...' : hasPrice ? 'Continuar al pago' : 'Inscribir'}
             </button>
           </div>
         </form>

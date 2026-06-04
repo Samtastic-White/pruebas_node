@@ -35,11 +35,15 @@ export const registrationService = {
     }
   },
 
-  create: async (data: { event_id: number; full_name: string; dni: string; email?: string; phone?: string }) => {
+  create: async (data: { event_id: number; full_name: string; dni: string; email?: string; phone?: string; payment_intent_id?: string, amount?: number }) => {
     try {
       const event = await eventRepository.findById(data.event_id)
       if (!event) throw new Error('Evento no encontrado')
       if (event.status !== 'active') throw new Error('El evento no está activo')
+
+      if (event.price > 0 && !data.payment_intent_id) {
+        throw new Error('Este evento requiere pago')
+      }
       
       if (event.max_slots > 0) {
         const count = await registrationRepository.countByEvent(data.event_id)
@@ -58,10 +62,13 @@ export const registrationService = {
       
       const registration = await registrationRepository.create({
         event_id: data.event_id,
-        runner_id: runner.id
+        runner_id: runner.id,
+        payment_intent_id: data.payment_intent_id,
+        status: data.payment_intent_id ? 'confirmed' : 'pending',
+        amount: data.amount,
       })
       
-      await log('success', 'REGISTRATION_CREATED', { registration_id: registration.id, event_id: data.event_id, dni: data.dni })
+      await log('success', 'REGISTRATION_CREATED', { registration_id: registration.id, event_id: data.event_id, dni: data.dni, payment_status: data.payment_intent_id ? 'paid' : 'free' })
       return registration
       
     } catch (error: any) {
