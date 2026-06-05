@@ -1,4 +1,3 @@
-// components/ModalInscripcion.tsx
 import { useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { toast } from 'sonner'
@@ -51,7 +50,7 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
             registrationData: value,
           })
           setClientSecret(data.clientSecret)
-          setFormData({ ...value, amount: data.Amount })
+          setFormData({ ...value, amount: data.Amount, receipt_url: data.invoiceUrl })
           setStep('payment')
         } else {
           await api.post('/registrations', value)

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Stripe from 'stripe';
 import { runnerRepository } from "../../infrastructure/database/postgres/repositories/runner.repository";
+import { eventRepository } from "../../infrastructure/database/postgres/repositories/event.repository";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2026-05-27.dahlia'
@@ -49,10 +50,12 @@ async function getOrCreateCustomer(
 
 export const createPaymentIntent = async (req: Request, res: Response) => {
     try {
-        const { amount, registrationData } = req.body;
+        const { registrationData } = req.body;
+
+        console.log('Received:', { registrationData });
 
         const event = await eventRepository.findById(registrationData.event_id);
-
+        
         if (!event) {
             return res.status(404).json({ error: 'Evento no encontrado' });
         }
@@ -63,30 +66,48 @@ export const createPaymentIntent = async (req: Request, res: Response) => {
             registrationData.dni
         );
 
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(Number(event.price) * 100),
-            currency: 'usd',
+        // 1. Crear Invoice como borrador
+        const invoice = await stripe.invoices.create({
             customer: customerId,
-            payment_method_types: ['card'],
+            collection_method: 'charge_automatically',
             metadata: {
                 full_name: registrationData.full_name,
                 dni: registrationData.dni,
                 email: registrationData.email,
                 event_id: String(registrationData.event_id),
                 event_name: event.name,
-                stripe_price_id: event.stripe_price_id || '',
             },
         });
+
+        // 2. Agregar el precio (compatible con v22)
+        await stripe.invoiceItems.create({
+            customer: customerId,
+            price_data: {
+                currency: 'usd',
+                product: event.stripe_product_id!,
+                unit_amount: Math.round(Number(event.price) * 100),
+            },
+            invoice: invoice.id,
+        });
+
+        // 3. Finalizar (genera Payment Intent)
+        const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
+
+        // 4. Extraer el Payment Intent
+        const paymentIntentId = (finalizedInvoice as any).payment_intent as string;
+        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
         res.json({
             clientSecret: paymentIntent.client_secret,
             paymentIntentId: paymentIntent.id,
+            invoiceId: invoice.id,
+            invoiceUrl: finalizedInvoice.hosted_invoice_url,
             amount: paymentIntent.amount,
         });
     } catch (error: any) {
-        console.error('Error creating payment intent', error.message);
+        console.error('Error creating invoice', error.message);
         res.status(500).json({
-            error: 'Error al crear el pago'
+            error: 'Error al crear la factura'
         });
     }
 };

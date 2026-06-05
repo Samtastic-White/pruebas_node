@@ -39,6 +39,8 @@ export const createRegistrationSchema = z.object({
   payment_intent_id: z.string().optional(),
 
   amount: z.number().optional(),  
+
+  receipt_url: z.string().optional(),
 })
 
 export type CreateRegistrationInput = z.infer<typeof createRegistrationSchema>

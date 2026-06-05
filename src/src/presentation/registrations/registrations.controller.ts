@@ -63,8 +63,11 @@ export const createRegistration = async (req: Request, res: Response) => {
           });
         }
 
-        const charge = paymentIntent.latest_charge as Stripe.Charge;
-        const receiptUrl = charge?.receipt_url || null;
+        const charges = await stripe.charges.list({
+          payment_intent: payment_intent_id,
+          limit: 1,
+        });
+        const receiptUrl = charges.data[0]?.receipt_url || null;
 
         (registrationData as any).receipt_url = receiptUrl;
 
