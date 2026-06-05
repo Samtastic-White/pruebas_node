@@ -94,7 +94,6 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
         className="bg-[#111] border border-[#f97316]/25 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/5">
           <div>
             <p className="text-[#f97316] text-xs font-bold uppercase tracking-wider">Inscripción</p>
@@ -111,7 +110,6 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
           </button>
         </div>
 
-        {/* Badge de precio */}
         {hasPrice && (
           <div className="mx-4 mt-4 bg-[#f97316]/10 border border-[#f97316]/25 rounded-lg p-3 flex items-center gap-3">
             <span>💳</span>
@@ -125,7 +123,6 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
           </div>
         )}
 
-        {/* Formulario */}
         <form
           onSubmit={(e) => {
             e.preventDefault()
