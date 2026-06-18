@@ -8,14 +8,54 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
 interface Props {
   evento: Event
   clientSecret: string
+  paymentIntentId: string
+  invoiceUrl?: string
+  amount: number
   onBack: () => void
   onClose: () => void
   onSuccess: (paymentIntentId: string) => void
   onError: (error: string) => void
 }
 
-export function PaymentStep({ evento, clientSecret, onBack, onClose, onSuccess, onError }: Props) {
-    console.log('clientSecret:', clientSecret?.substring(0, 20) + '...')
+export function PaymentStep({ 
+  evento, 
+  clientSecret, 
+  paymentIntentId,
+  amount, 
+  onBack, 
+  onClose, 
+  onSuccess, 
+  onError 
+}: Props) {
+  console.log('PaymentStep - Datos recibidos:', {
+    clientSecret: clientSecret?.substring(0, 30) + '...',
+    paymentIntentId,
+    amount,
+    amountInDollars: (amount / 100).toFixed(2)
+  })
+
+  if (!clientSecret) {
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-[#111] border border-[#f97316]/25 rounded-2xl w-full max-w-md p-8 text-center">
+          <div className="text-red-500 mb-4">
+            <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <p className="text-red-500 font-medium">Error: No se pudo inicializar el pago</p>
+          <p className="text-white/40 text-sm mt-2">Por favor, intenta nuevamente</p>
+          <button
+            onClick={onBack}
+            className="mt-6 bg-white/5 hover:bg-white/10 text-white py-2 px-6 rounded-lg transition-colors"
+          >
+            Volver al formulario
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div
@@ -24,7 +64,7 @@ export function PaymentStep({ evento, clientSecret, onBack, onClose, onSuccess, 
       >
         <div className="flex items-center justify-between p-4 border-b border-white/5">
           <div>
-            <p className="text-[#f97316] text-xs font-bold uppercase tracking-wider">Pago</p>
+            <p className="text-[#f97316] text-xs font-bold uppercase tracking-wider">Pago seguro</p>
             <h2 className="text-white font-bold text-lg">{evento.name}</h2>
           </div>
           <button
@@ -39,14 +79,6 @@ export function PaymentStep({ evento, clientSecret, onBack, onClose, onSuccess, 
         </div>
 
         <div className="p-4">
-          <div className="bg-white/5 border border-white/10 rounded-lg p-4 mb-6">
-            <div className="flex justify-between items-center">
-              <span className="text-white/70">Total a pagar</span>
-              <span className="text-2xl font-bold text-[#f97316]">
-                ${(evento.price)} USD
-              </span>
-            </div>
-          </div>
 
           <Elements
             stripe={stripePromise}
@@ -77,11 +109,6 @@ export function PaymentStep({ evento, clientSecret, onBack, onClose, onSuccess, 
           >
             ← Volver al formulario
           </button>
-
-          <div className="mt-4 p-3 bg-white/5 border border-white/10 rounded-lg">
-            <p className="text-white/40 text-xs mb-2">Tarjeta de prueba:</p>
-            <code className="text-white/60 text-xs">4242 4242 4242 4242</code>
-          </div>
         </div>
       </div>
     </div>

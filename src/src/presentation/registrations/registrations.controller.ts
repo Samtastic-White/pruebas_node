@@ -90,6 +90,135 @@ export const createRegistration = async (req: Request, res: Response) => {
   }
 }
 
+export const confirmPayment = async (req: Request, res: Response) => {
+  try {
+    const { paymentIntentId, invoiceId, registrationData } = req.body;
+
+    console.log('🔍 Confirmando pago:', {
+      paymentIntentId,
+      invoiceId,
+      registrationData
+    });
+
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (paymentIntent.status !== 'succeeded') {
+      return res.status(400).json({
+        error: 'El pago no se ha completado exitosamente',
+        status: paymentIntent.status
+      });
+    }
+
+    if (paymentIntent.metadata.event_id !== String(registrationData.event_id)) {
+      return res.status(400).json({
+        error: 'El pago no corresponde a este evento'
+      });
+    }
+
+    const existingReg = await registrationRepository.findByPaymentIntent(paymentIntentId);
+    if (existingReg) {
+      return res.status(409).json({
+        message: 'Este pago ya fue registrado',
+        registration: existingReg
+      });
+    }
+
+    let receiptUrl: string | null = null;
+
+    if (invoiceId && paymentIntent.payment_method) {
+      try {
+        console.log('Pagando factura con método de pago:', paymentIntent.payment_method);
+
+        const paidInvoice = await stripe.invoices.pay(invoiceId, {
+          payment_method: paymentIntent.payment_method as string,
+        });
+
+        console.log('Factura pagada exitosamente:', {
+          invoiceId: paidInvoice.id,
+          status: paidInvoice.status,
+          invoice_pdf: paidInvoice.invoice_pdf,
+          hosted_url: paidInvoice.hosted_invoice_url,
+        });
+
+        receiptUrl = paidInvoice.hosted_invoice_url || null;
+
+      } catch (invoiceError: any) {
+        console.error('Error pagando factura:', {
+          message: invoiceError.message,
+          code: invoiceError.code,
+        });
+
+        if (invoiceError.code === 'invoice_paid') {
+          console.log('La factura ya estaba pagada');
+          try {
+            const invoice = await stripe.invoices.retrieve(invoiceId);
+            receiptUrl = invoice.hosted_invoice_url || null;
+            console.log('URL de factura obtenida:', receiptUrl);
+          } catch (retrieveError: any) {
+            console.error('Error obteniendo factura:', retrieveError.message);
+          }
+        } else {
+          try {
+            const invoice = await stripe.invoices.retrieve(invoiceId);
+            receiptUrl = invoice.hosted_invoice_url || null;
+          } catch (retrieveError: any) {
+            console.error('No se pudo obtener la factura:', retrieveError.message);
+          }
+        }
+      }
+    }
+
+    if (!receiptUrl) {
+      try {
+        const charges = await stripe.charges.list({
+          payment_intent: paymentIntentId,
+          limit: 1,
+        });
+        receiptUrl = charges.data[0]?.receipt_url || null;
+      } catch (chargeError: any) {
+        console.error('Error obteniendo charges:', chargeError.message);
+      }
+    }
+
+    const registration = await registrationService.create({
+      event_id: Number(registrationData.event_id),
+      full_name: registrationData.full_name,
+      dni: registrationData.dni,
+      email: registrationData.email,
+      phone: registrationData.phone,
+      payment_intent_id: paymentIntentId,
+      amount: paymentIntent.amount,
+      receipt_url: receiptUrl || undefined,
+    });
+
+    console.log('Inscripción creada exitosamente:', {
+      id: registration.id,
+      runner: registrationData.full_name,
+      event: registrationData.event_id,
+      payment: paymentIntentId,
+      receipt: receiptUrl,
+    });
+
+    return res.status(201).json({
+      message: 'Inscripción confirmada y factura pagada',
+      registration,
+      receiptUrl,
+    });
+
+  } catch (error: any) {
+    console.error('Error en confirmPayment:', {
+      message: error.message,
+      type: error.type,
+      code: error.code,
+    });
+
+    return res.status(500).json({
+      error: 'Error al confirmar el pago',
+      details: error.message,
+    });
+  }
+};
+
 export const cancelRegistration = async (req: Request, res: Response) => {
   try {
     const result = await registrationService.cancel(Number(req.params.id))

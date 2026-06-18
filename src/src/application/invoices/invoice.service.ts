@@ -14,6 +14,7 @@ export const invoiceService = {
       payment_status: r.payment_status || 'succeeded',
       paid_at: r.paid_at || r.created_at,
       created_at: r.created_at,
+      receipt_url: r.receipt_url,
     }))
   }
 }

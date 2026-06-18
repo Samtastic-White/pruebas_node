@@ -3,6 +3,7 @@ import { registrationRepository } from '../../infrastructure/database/postgres/r
 import { eventRepository } from '../../infrastructure/database/postgres/repositories/event.repository'
 import { logSuccess, logError } from '../../infrastructure/database/mongo/services/logservice'
 import { db } from '../../infrastructure/database'
+import { string } from 'zod'
 
 const log = async (type: 'success' | 'error', accion: string, mensajeODetalles?: string | object) => {
   if (type === 'success') {
@@ -35,7 +36,17 @@ export const registrationService = {
     }
   },
 
-  create: async (data: { event_id: number; full_name: string; dni: string; email?: string; phone?: string; payment_intent_id?: string, amount?: number }) => {
+  create: async (data: {
+    runner_id?: number;
+    event_id: number;
+    full_name?: string;
+    dni?: string;
+    email?: string;
+    phone?: string;
+    payment_intent_id?: string;
+    amount?: number;
+    receipt_url?: string | null;
+  }) => {
     try {
       const event = await eventRepository.findById(data.event_id)
       if (!event) throw new Error('Evento no encontrado')
@@ -44,34 +55,53 @@ export const registrationService = {
       if (event.price > 0 && !data.payment_intent_id) {
         throw new Error('Este evento requiere pago')
       }
-      
+
       if (event.max_slots > 0) {
         const count = await registrationRepository.countByEvent(data.event_id)
         if (Number(count[0].count) >= event.max_slots) throw new Error('Cupos agotados')
       }
-      
-      let runner = await runnerRepository.findByDni(data.dni)
-      if (!runner) {
-        runner = await runnerRepository.create({
-          full_name: data.full_name,
-          dni: data.dni,
-          email: data.email,
-          phone: data.phone
-        })
+
+      let runner;
+      if (data.runner_id) {
+        runner = await runnerRepository.findById(data.runner_id);
+        if (!runner) throw new Error('Runner no encontrado');
+      } else if (data.dni) {
+        runner = await runnerRepository.findByDni(data.dni);
+        if (!runner) {
+          runner = await runnerRepository.create({
+            full_name: data.full_name || '',
+            dni: data.dni,
+            email: data.email,
+            phone: data.phone
+          });
+        }
+      } else {
+        throw new Error('Se requiere runner_id o dni');
       }
-      
-      const registration = await registrationRepository.create({
+
+      const registrationData: any = {
         event_id: data.event_id,
         runner_id: runner.id,
         payment_intent_id: data.payment_intent_id,
         status: data.payment_intent_id ? 'confirmed' : 'pending',
         amount: data.amount,
-        receipt_url: (data as any).receipt_url,
-      })
-      
-      await log('success', 'REGISTRATION_CREATED', { registration_id: registration.id, event_id: data.event_id, dni: data.dni, payment_status: data.payment_intent_id ? 'paid' : 'free' })
-      return registration
-      
+      };
+
+      if (data.receipt_url) {
+        registrationData.receipt_url = data.receipt_url;
+      }
+
+      const registration = await registrationRepository.create(registrationData);
+
+      await log('success', 'REGISTRATION_CREATED', {
+        registration_id: registration.id,
+        event_id: data.event_id,
+        dni: data.dni || runner.dni,
+        payment_status: data.payment_intent_id ? 'paid' : 'free'
+      });
+
+      return registration;
+
     } catch (error: any) {
       if (error.code === '23505') {
         await log('error', 'REGISTRATION_DUPLICATED', `DNI ${data.dni} ya inscrito en evento ${data.event_id}`)
@@ -85,7 +115,7 @@ export const registrationService = {
   cancel: async (id: number) => {
     try {
       const registration = await db('registrations').where({ id }).first()
-      
+
       if (!registration) {
         await log('error', 'REGISTRATION_NOT_FOUND', `Inscripción ${id} no encontrada`)
         return null

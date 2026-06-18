@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile.local
     ports:
-      - "3000:5173"
+      - "3080:5173"
     networks:
       - marathon_network
 

@@ -15,11 +15,17 @@ type Step = 'form' | 'payment'
 
 export default function ModalInscripcion({ evento, onClose }: Props) {
   const [step, setStep] = useState<Step>('form')
-  const [clientSecret, setClientSecret] = useState('')
+  const [paymentInfo, setPaymentInfo] = useState<{
+    clientSecret: string;
+    paymentIntentId: string;
+    invoiceId?: string;
+    invoiceUrl?: string;
+    amount: number;
+  } | null>(null)
   const [formData, setFormData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const hasPrice = evento.price && evento.price > 0
+  const hasPrice = evento.price && Number(evento.price) > 0
 
   const form = useForm({
     defaultValues: {
@@ -45,20 +51,43 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
       setIsLoading(true)
       try {
         if (hasPrice) {
-          const paymentAmount = Math.round(Number(evento.price) * 100)
+          console.log('Enviando datos de pago:', value)
+
           const { data } = await api.post('/payment', {
             registrationData: value,
           })
-          setClientSecret(data.clientSecret)
-          setFormData({ ...value, amount: data.Amount, receipt_url: data.invoiceUrl })
+
+          console.log('Respuesta del backend:', data)
+
+          // Validar que tengamos los datos necesarios
+          if (!data.clientSecret || !data.paymentIntentId) {
+            throw new Error('No se recibió la información de pago necesaria')
+          }
+
+          // Guardar toda la información del pago
+          setPaymentInfo({
+            clientSecret: data.clientSecret,
+            paymentIntentId: data.paymentIntentId,
+            invoiceId: data.invoiceId, // ✅ GUARDAR invoiceId
+            invoiceUrl: data.invoiceUrl,
+            amount: data.amount,
+          })
+
+          // Guardar datos del formulario para el registro posterior
+          setFormData(value)
+
+          // Cambiar al paso de pago
           setStep('payment')
+
         } else {
+          // Evento gratuito - registrar directamente
           await api.post('/registrations', value)
           toast.success('¡Inscripción exitosa! Nos vemos en la carrera')
           onClose()
         }
       } catch (error: any) {
-        toast.error(error.response?.data?.error || 'Error al inscribir')
+        console.error('Error:', error)
+        toast.error(error.response?.data?.error || error.message || 'Error al procesar')
       } finally {
         setIsLoading(false)
       }
@@ -67,28 +96,57 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
 
   const handlePaymentSuccess = async (paymentIntentId: string) => {
     try {
-      await api.post('/registrations', {
-        ...formData,
-        payment_intent_id: paymentIntentId,
-      })
-      toast.success('¡Inscripción exitosa! Nos vemos en la carrera')
-      onClose()
+      console.log('Pago exitoso, confirmando...', {
+        paymentIntentId,
+        formData,
+        invoiceId: paymentInfo?.invoiceId // ✅ Ahora sí existe
+      });
+
+      await api.post('/registrations/confirm-payment', {
+        paymentIntentId: paymentIntentId,
+        invoiceId: paymentInfo?.invoiceId, // ✅ Pasarlo al backend
+        registrationData: formData,
+      });
+
+      toast.success('¡Inscripción exitosa! Nos vemos en la carrera');
+      onClose();
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Error al registrar')
-      setStep('form')
+      console.error('Error al confirmar:', error);
+
+      // Si el error es porque ya existe la inscripción (409)
+      if (error.response?.status === 409) {
+        toast.success('Tu inscripción ya fue registrada');
+        onClose();
+      } else {
+        toast.error(
+          error.response?.data?.error ||
+          error.response?.data?.details ||
+          'Error al confirmar la inscripción'
+        );
+      }
     }
+  };
+
+  if (step === 'payment' && paymentInfo?.clientSecret) {
+    return (
+      <PaymentStep
+        evento={evento}
+        clientSecret={paymentInfo.clientSecret}
+        paymentIntentId={paymentInfo.paymentIntentId}
+        invoiceUrl={paymentInfo.invoiceUrl}
+        amount={paymentInfo.amount}
+        onBack={() => setStep('form')}
+        onClose={onClose}
+        onSuccess={handlePaymentSuccess}
+        onError={(e) => {
+          toast.error(e)
+        }}
+      />
+    )
   }
 
-  return step === 'payment' && clientSecret ? (
-    <PaymentStep
-      evento={evento}
-      clientSecret={clientSecret}
-      onBack={() => setStep('form')}
-      onClose={onClose}
-      onSuccess={handlePaymentSuccess}
-      onError={(e) => toast.error(e)}
-    />
-  ) : (
+  // Mostrar formulario
+  return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div
         className="bg-[#111] border border-[#f97316]/25 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
@@ -118,7 +176,7 @@ export default function ModalInscripcion({ evento, onClose }: Props) {
               <p className="text-white/50 text-xs">Se te redirigirá al pago seguro</p>
             </div>
             <span className="ml-auto text-[#f97316] font-bold">
-              ${(evento.price)}
+              ${Number(evento.price).toFixed(2)} USD
             </span>
           </div>
         )}

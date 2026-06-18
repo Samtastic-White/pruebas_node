@@ -8,7 +8,7 @@ services:
     env_file:
       - ./src/.env
     ports:
-      - 4012:4000
+      - 4080:4000
     volumes:
       - ./src/src:/app/src
     depends_on:
@@ -21,7 +21,7 @@ services:
     build:
       context: ./postgres
       dockerfile: Dockerfile.local
-    container_name: postgres_seed
+    container_name: postgres_seed_marathon
     restart: unless-stopped
     env_file:
       - src/.env
