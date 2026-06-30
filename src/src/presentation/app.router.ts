@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { healthRoutes } from './health/health.routes'
 import { eventsRoutes } from './events/events.routes'
 import { authRoutes } from './auth/auth.routes'
 import { paymentRoutes } from './payment/payment.routes'
@@ -16,6 +17,7 @@ class AppRouter {
 
   private initializeRoutes(): void {
     const routes: Array<{ path: string; router: Router }> = [
+      { path: "/health", router: healthRoutes },
       { path: '/events', router: eventsRoutes },
       { path: '/registrations', router: registrationsRoutes },
       { path: '/auth', router: authRoutes },

@@ -21,4 +21,6 @@ export const envs = {
   MONGO_HOST: String(process.env.MONGO_HOST),
   MONGO_PORT: Number(process.env.MONGO_PORT),
   MONGO_DB: String(process.env.MONGO_DB),
+
+  GOTENBERG_URL: String(process.env.GOTENBERG_URL),
 }

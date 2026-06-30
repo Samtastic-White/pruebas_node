@@ -1,0 +1,204 @@
+<div class="main">
+
+    <!-- HEADER -->
+    <div class="grid header-grid">
+      <div class="cell logo" style="grid-row: span 2;">
+        <img src="https://i.postimg.cc/YCQ0GsHZ/Orion.jpg" alt="test">
+      </div>
+
+      <div class="cell center">
+        <h1>INFORME TECNICO DEL MARATON </h1>
+      </div>
+
+      <div class="cell logo" style="grid-row: span 2;">
+        <img src="https://i.postimg.cc/YCQ0GsHZ/Orion.jpg" alt="test">
+      </div>
+
+      <div class="cell center">
+        Datos del Maraton
+      </div>
+    </div>
+
+    <div class="center" style="font-size:12px; font-style:italic;">
+      Documento oficial mio para maratones<br>
+      No. de contrato: 1234567890<br>
+    </div>
+
+    <!-- INFO -->
+    <div class="grid info-grid">
+      <div class="cell label">Evento</div>
+      <div class="cell">{evento}</div>
+
+      <div class="cell label">Limite de Runners</div>
+      <div class="cell">{limiteRunners}</div>
+
+      <div class="cell label">Fecha</div>
+      <div class="cell">{fecha}</div>
+
+      <div class="cell label">Distancia</div>
+      <div class="cell">{distancia}</div>
+
+      <div class="cell label">Lugar</div>
+      <div class="cell">{lugar}</div>
+    </div>
+
+    <!-- INDICADOR -->
+    <div class="section-title">Inscripciones</div>
+    <div>Indicador Asistencial</div>
+
+    <div class="grid indicador-grid">
+      <div class="cell label center">INDICADOR DE INSCRIPCIONES</div>
+      <div class="cell label center">CANTIDAD</div>
+
+      <div class="cell">Runners inscritos</div>
+      <div class="cell center">{cantidad}</div>
+    </div>
+
+    <!-- POBLACION -->
+    <div class="grid population-grid">
+      <div class="cell header-cell">Corredor</div>
+      <div class="cell header-cell">DNI</div>
+      <div class="cell header-cell">Email</div>
+      <div class="cell header-cell">Evento</div>
+      <div class="cell header-cell">Fecha</div>
+
+      <div class="cell">{corredor}</div>
+      <div class="cell">{dni}</div>
+      <div class="cell">{email}</div>
+      <div class="cell">{evento}</div>
+      <div class="cell">{fecha}</div>
+    </div>
+  
+<head>
+  <meta charset="UTF-8">
+  <title>Reporte</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    /* CONTENEDOR */
+    .main {
+      max-width: 794px;
+      margin: 0 auto;
+      width: 538.58pt;
+      height: 785.19pt;
+    }
+
+    /* GRID BASE */
+    .grid {
+      display: grid;
+      width: 100%;
+    }
+
+    .cell {
+      border: 1px solid #000;
+      padding: 5px;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+
+    .label {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    /* HEADER */
+    .header-grid {
+      grid-template-columns: 100px 1fr 100px;
+      grid-template-rows: auto auto;
+      margin-bottom: 10px;
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo img {
+      width: 100px;
+      height: 100px;
+    }
+
+    /* INFO SIMPLE */
+    .info-grid {
+      grid-template-columns: 150px 1fr;
+      margin: 10px 0;
+    }
+
+    /* GRID COMPLEJO */
+    .complex-grid {
+      grid-template-columns: 150px repeat(6, 1fr);
+      margin: 10px 0;
+    }
+
+    /* INDICADOR */
+    .indicador-grid {
+      grid-template-columns: 1fr 150px;
+      margin: 10px 0;
+    }
+
+    /* POBLACION */
+    .population-grid {
+      grid-template-columns: repeat(5, 1fr);
+      font-size: 10px;
+      margin: 10px 0;
+    }
+
+    .header-cell {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+
+    /* CAJAS */
+    .section-title {
+      font-weight: bold;
+      margin: 20px 0 10px 0;
+      font-size: 14px;
+    }
+
+    .content-box {
+      border: 1px solid #000;
+      min-height: 200px;
+      padding: 10px;
+    }
+
+    /* FIRMA */
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin-top: 40px;
+    }
+
+    .signature-line {
+      border-top: 1px solid #000;
+      padding-top: 5px;
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    /* TRAZABILIDAD */
+    .trazabilidad-grid {
+      grid-template-columns: repeat(4, 1fr);
+      margin-top: 20px;
+    }
+
+    /* PAGE BREAK */
+    .page-break {
+      page-break-before: always;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+        padding: 15px;
+      }
+    }
+  </style>
+</head>

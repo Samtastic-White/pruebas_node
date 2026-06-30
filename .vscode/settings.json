@@ -1,5 +1,6 @@
 {
     "exportall.config.folderListener": [
-        "/src/src/presentation/invoices"
+        "/src/src/presentation/invoices",
+        "/src/src/infrastructure/config"
     ]
 }

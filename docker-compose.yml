@@ -14,6 +14,7 @@ services:
     depends_on:
       - postgres_seed
       - mongo_seed
+      - gotenberg_seed
     networks:
       - marathon_network
 
@@ -30,6 +31,13 @@ services:
     ports:
       - 5433:5432
     shm_size: 256mb
+    networks:
+      - marathon_network
+
+  gotenberg_seed:
+    image: gotenberg/gotenberg:8
+    container_name: gottenberg_seed
+    restart: unless-stopped
     networks:
       - marathon_network
 
