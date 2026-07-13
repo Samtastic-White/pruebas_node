@@ -1,7 +1,7 @@
 import { runnerRepository } from '../../infrastructure/database/postgres/repositories/runner.repository'
 import { registrationRepository } from '../../infrastructure/database/postgres/repositories/registration.repository'
 import { eventRepository } from '../../infrastructure/database/postgres/repositories/event.repository'
-import { logSuccess, logError } from '../../infrastructure/database/mongo/services/logservice'
+import { logSuccess, logError } from '../../infrastructure/database/dynamodb/services/logservice'
 import { db } from '../../infrastructure/database'
 import { string } from 'zod'
 

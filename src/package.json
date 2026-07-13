@@ -10,7 +10,8 @@
     "migrate:make": "knex migrate:make --knexfile knexfile.ts",
     "migrate:latest": "knex migrate:latest --knexfile knexfile.ts",
     "migrate:rollback": "knex migrate:rollback --knexfile knexfile.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dynamo:seed": "tsx src/infrastructure/database/dynamodb/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +27,8 @@
     "jsonwebtoken": "^9.0.3",
     "knex": "^3.2.10",
     "mongoose": "^9.6.1",
+    "@aws-sdk/client-dynamodb": "^3.700.0",
+    "@aws-sdk/lib-dynamodb": "^3.700.0",
     "pg": "^8.20.0",
     "stripe": "^22.2.0",
     "zod": "^4.4.3"

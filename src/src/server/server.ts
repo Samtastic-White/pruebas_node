@@ -1,7 +1,7 @@
 import compression from 'compression'
 import cors from 'cors'
 import express, { type Router } from 'express'
-import { connectMongo } from '../infrastructure/database/mongo/connection'
+import { connectDynamoDB } from '../infrastructure/database/dynamodb/connection'
 import { seedAdmin } from '../infrastructure/database/postgres/seeds/admin.seed'
 import { eventService } from '../application/events/event.service'
 
@@ -29,7 +29,7 @@ export class Server {
 
   public async start(): Promise<void> {
     this.middlewares()
-    await connectMongo()
+    await connectDynamoDB()
     await seedAdmin()
     await eventService.updateExpiredEvents()
     

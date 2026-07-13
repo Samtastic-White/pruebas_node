@@ -6,6 +6,7 @@ import { paymentRoutes } from './payment/payment.routes'
 import { registrationsRoutes } from './registrations'
 import { runnersRoutes } from './runners'
 import { invoiceRoutes } from './invoices/invoices.routes'
+import { logsRoutes } from './logs/logs.routes'
 
 class AppRouter {
   private readonly router: Router
@@ -24,6 +25,7 @@ class AppRouter {
       { path: '/runners', router: runnersRoutes },
       { path: '/payment', router: paymentRoutes },
       { path: '/invoices', router: invoiceRoutes },
+      { path: '/logs', router: logsRoutes },
     ]
 
     routes.forEach(({ path, router }) => {

@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import db from '../../infrastructure/database/postgres/connection'
 import { envs } from '../../infrastructure/config/environments'
-import { logSuccess, logError } from '../../infrastructure/database/mongo/services/logservice'
+import { logSuccess, logError } from '../../infrastructure/database/dynamodb/services/logservice'
 
 const log = async (type: 'success' | 'error', accion: string, mensajeODetalles?: string | object) => {
   if (type === 'success') {

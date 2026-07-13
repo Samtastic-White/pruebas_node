@@ -23,4 +23,9 @@ export const envs = {
   MONGO_DB: String(process.env.MONGO_DB),
 
   GOTENBERG_URL: String(process.env.GOTENBERG_URL),
+
+  AWS_ACCESS_KEY_ID: String(process.env.AWS_ACCESS_KEY_ID),
+  AWS_SECRET_ACCESS_KEY: String(process.env.AWS_SECRET_ACCESS_KEY),
+  AWS_REGION: String(process.env.AWS_REGION) || 'us-east-1',
+  DYNAMO_ENDPOINT: process.env.DYNAMO_ENDPOINT || '',
 }

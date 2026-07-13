@@ -1,4 +1,4 @@
-import { logSuccess, logError } from '../database/mongo/services/logservice'
+import { logSuccess, logError } from '../database/dynamodb/services/logservice'
 
 export const logWrapper = async <T>(
   useCase: () => Promise<T>,

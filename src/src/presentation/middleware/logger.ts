@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { logSuccess, logError } from '../../infrastructure/database/mongo/services/logservice'
+import { logSuccess, logError } from '../../infrastructure/database/dynamodb/services/logservice'
 
 export const loggerMiddleware = (action: string, module: string) => {
   return (req: Request, res: Response, next: NextFunction) => {

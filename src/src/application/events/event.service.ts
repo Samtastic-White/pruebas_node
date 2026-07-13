@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
 import { eventRepository } from '../../infrastructure/database/postgres/repositories/event.repository'
-import { logSuccess, logError } from '../../infrastructure/database/mongo/services/logservice'
+import { logSuccess, logError } from '../../infrastructure/database/dynamodb/services/logservice'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-05-27.dahlia'

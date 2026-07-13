@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LayoutDashboard, CalendarDays, ClipboardList, Users, UserPlus, UserCircle, LogOut, Menu, X, ReceiptText } from 'lucide-react'
+import { LayoutDashboard, CalendarDays, ClipboardList, Users, UserPlus, UserCircle, LogOut, Menu, X, ReceiptText, ScrollText } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 
@@ -14,6 +14,7 @@ export const Sidebar = () => {
     { icon: UserPlus, label: 'Inscribir corredor', path: '/register-runner' },
     { icon: UserCircle, label: 'Perfil', path: '/profile' },
     { icon: ReceiptText, label: 'Facturas', path: '/invoices' },
+    { icon: ScrollText, label: 'Logs', path: '/logs' },
   ]
 
   const handleLogout = () => {

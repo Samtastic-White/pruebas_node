@@ -1,6 +1,6 @@
 import { runnerRepository } from '../../infrastructure/database/postgres/repositories/runner.repository'
 import db from '../../infrastructure/database/postgres/connection'
-import { logSuccess, logError } from '../../infrastructure/database/mongo/services/logservice'
+import { logSuccess, logError } from '../../infrastructure/database/dynamodb/services/logservice'
 
 const log = async (type: 'success' | 'error', accion: string, mensajeODetalles?: string | object) => {
   if (type === 'success') {
